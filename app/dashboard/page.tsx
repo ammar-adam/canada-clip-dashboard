@@ -8,11 +8,11 @@ export default function DashboardPage() {
     <div>
       <HeroStatRow />
       <StolenCustomersChart />
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-        <div className="lg:col-span-1">
+      <div className="grid grid-cols-1 lg:grid-cols-5 gap-8">
+        <div className="lg:col-span-2">
           <CompetitorBreakdown />
         </div>
-        <div className="lg:col-span-2">
+        <div className="lg:col-span-3">
           <ActivityFeed />
         </div>
       </div>

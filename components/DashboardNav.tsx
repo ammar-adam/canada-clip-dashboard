@@ -14,21 +14,26 @@ export function DashboardNav() {
   const pathname = usePathname();
 
   return (
-    <div className="flex gap-1">
+    <nav className="flex gap-8">
       {links.map(({ href, label, icon: Icon }) => {
-        const isActive = pathname === href || (href !== "/dashboard" && pathname.startsWith(href));
+        const isActive =
+          pathname === href ||
+          (href !== "/dashboard" && pathname.startsWith(href));
         return (
           <Link
             key={href}
             href={href}
-            data-active={isActive}
-            className="flex items-center gap-2 px-4 py-3 text-sm font-medium text-text-secondary hover:text-text-primary border-b-2 border-transparent hover:border-text-secondary/50 transition-colors data-[active]:text-text-primary data-[active]:border-accent-red"
+            className={`flex items-center gap-2 px-1 py-2 text-sm font-medium border-b-2 transition-colors ${
+              isActive
+                ? "text-[#E8EDF5] border-[#C8102E]"
+                : "text-[#5A7A9E] border-transparent hover:text-[#E8EDF5]"
+            }`}
           >
             <Icon className="w-4 h-4" />
             {label}
           </Link>
         );
       })}
-    </div>
+    </nav>
   );
 }

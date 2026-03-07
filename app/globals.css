@@ -3,15 +3,43 @@
 @tailwind utilities;
 
 :root {
-  --bg-primary: #0a0f1e;
-  --bg-card: #111827;
-  --accent-red: #ff0000;
-  --accent-green: #10b981;
-  --text-primary: #f9fafb;
-  --text-secondary: #9ca3af;
-  --border: #1f2937;
+  /* Backgrounds */
+  --bg-base: #050c1a;
+  --bg-card: #0b1628;
+  --bg-card-hover: #0f1e36;
+  --bg-elevated: #132040;
+
+  /* Borders */
+  --border-subtle: #1a2e4a;
+  --border-active: #c8102e;
+
+  /* Text */
+  --text-primary: #e8edf5;
+  --text-secondary: #5a7a9e;
+  --text-muted: #2e4a6b;
+
+  /* Accents */
+  --red-primary: #c8102e;
+  --red-hover: #e8132f;
+  --red-subtle: #1a0810;
+  --green: #0ea472;
+  --green-subtle: #051a12;
+  --yellow: #d4930a;
+  --blue-accent: #1e6fd4;
 }
 
 body {
-  background-color: var(--bg-primary);
+  background-color: var(--bg-base);
+  color: var(--text-primary);
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }

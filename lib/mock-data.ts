@@ -37,44 +37,104 @@ export const HERO_STATS = [
   },
 ];
 
-export const WEEKLY_STOLEN = [
-  { day: "Mon", stolen: 28, brand: "Jansport" },
-  { day: "Tue", stolen: 35, brand: "Herschel" },
-  { day: "Wed", stolen: 31, brand: "North Face" },
-  { day: "Thu", stolen: 42, brand: "Jansport" },
-  { day: "Fri", stolen: 38, brand: "Herschel" },
-  { day: "Sat", stolen: 51, brand: "North Face" },
-  { day: "Sun", stolen: 22, brand: "Others" },
+// Stacked bar chart: per-day breakdown by brand
+export const WEEKLY_STACKED = [
+  { day: "Mon", Jansport: 12, Herschel: 8, "North Face": 6, Others: 2 },
+  { day: "Tue", Jansport: 15, Herschel: 11, "North Face": 7, Others: 2 },
+  { day: "Wed", Jansport: 13, Herschel: 9, "North Face": 7, Others: 2 },
+  { day: "Thu", Jansport: 18, Herschel: 13, "North Face": 8, Others: 3 },
+  { day: "Fri", Jansport: 16, Herschel: 12, "North Face": 7, Others: 3 },
+  { day: "Sat", Jansport: 21, Herschel: 15, "North Face": 11, Others: 4 },
+  { day: "Sun", Jansport: 9, Herschel: 7, "North Face": 4, Others: 2 },
 ];
 
-export const COMPETITOR_BREAKDOWN = [
-  { name: "Jansport", customers: 89, percent: 36, color: "#FF6B6B" },
-  { name: "Herschel", customers: 71, percent: 29, color: "#4ECDC4" },
-  { name: "North Face", customers: 54, percent: 22, color: "#45B7D1" },
-  { name: "Others", customers: 33, percent: 13, color: "#96CEB4" },
+export const STACKED_COLORS = {
+  Jansport: "#E5484D",
+  Herschel: "#30A46C",
+  "North Face": "#3B82F6",
+  Others: "#6B7280",
+};
+
+// Who you're stealing from — 6 brands, CSS bars (max = Jansport 104)
+export const WHO_STEALING_FROM = [
+  { name: "Jansport", customers: 104, color: "#E5484D" },
+  { name: "Herschel", customers: 75, color: "#30A46C" },
+  { name: "North Face", customers: 50, color: "#3B82F6" },
+  { name: "REI", customers: 28, color: "#F5A623" },
+  { name: "MEC", customers: 19, color: "#8B5CF6" },
+  { name: "Others", customers: 11, color: "#6B7280" },
 ];
 
-export const ACTIVITY_FEED = [
-  { id: "1", time: "2 mins ago", query: "backpack under $200", intercepted: "Jansport.com", action: "Purchased", province: "ON" },
-  { id: "2", time: "4 mins ago", query: "Canadian made backpack", intercepted: "Herschel.com", action: "Clicked", province: "BC" },
-  { id: "3", time: "6 mins ago", query: "hiking pack Canada", intercepted: "NorthFace.com", action: "Viewed", province: "QC" },
-  { id: "4", time: "8 mins ago", query: "Jansport alternative", intercepted: "Jansport.com", action: "Clicked", province: "AB" },
-  { id: "5", time: "11 mins ago", query: "best backpack for students", intercepted: "Herschel.com", action: "Viewed", province: "ON" },
-  { id: "6", time: "14 mins ago", query: "durable canvas backpack", intercepted: "NorthFace.com", action: "Purchased", province: "BC" },
-  { id: "7", time: "17 mins ago", query: "backpack under $200", intercepted: "Jansport.com", action: "Viewed", province: "MB" },
-  { id: "8", time: "20 mins ago", query: "Canadian hiking gear", intercepted: "REI.com", action: "Clicked", province: "ON" },
-  { id: "9", time: "23 mins ago", query: "backpack under $200", intercepted: "Jansport.com", action: "Purchased", province: "QC" },
-  { id: "10", time: "26 mins ago", query: "eco friendly backpack", intercepted: "Herschel.com", action: "Viewed", province: "NS" },
+const MAX_STEALING = 104;
+
+export function stealingBarWidth(customers: number) {
+  return (customers / MAX_STEALING) * 100;
+}
+
+// Activity feed row pool — diversify queries (exact data from spec)
+export const ACTIVITY_ROW_POOL = [
+  { time: "just now", query: "backpack under $200", intercepted: "Jansport.com", action: "Purchased" as const, province: "ON" },
+  { time: "1 min ago", query: "best hiking boots Canada", intercepted: "MEC.ca", action: "Clicked" as const, province: "BC" },
+  { time: "2 min ago", query: "Canadian made wallet", intercepted: "Herschel.com", action: "Viewed" as const, province: "QC" },
+  { time: "3 min ago", query: "waterproof jacket alternative", intercepted: "NorthFace.com", action: "Purchased" as const, province: "AB" },
+  { time: "4 min ago", query: "affordable travel bag", intercepted: "Samsonite.com", action: "Clicked" as const, province: "ON" },
+  { time: "5 min ago", query: "handmade leather goods", intercepted: "Roots.com", action: "Viewed" as const, province: "MB" },
+  { time: "6 min ago", query: "Canadian outdoor gear", intercepted: "REI.com", action: "Purchased" as const, province: "BC" },
+  { time: "7 min ago", query: "tote bag under $100", intercepted: "Herschel.com", action: "Clicked" as const, province: "NS" },
+  { time: "8 min ago", query: "durable school backpack", intercepted: "Jansport.com", action: "Viewed" as const, province: "ON" },
+  { time: "9 min ago", query: "buy Canadian clothing brand", intercepted: "Lululemon.com", action: "Purchased" as const, province: "QC" },
 ];
 
-export const DEFAULT_LISTING =
-  "Northbound Packs — handmade hiking backpacks. Durable canvas material. Multiple sizes. Ships across Canada. Starting at $89.";
+// GEO products
+export const GEO_PRODUCTS = [
+  {
+    id: "city-pack",
+    name: "City Pack 28L",
+    price: 179,
+    description:
+      "Northbound Packs City Pack 28L — handmade canvas hiking backpack. Durable YKK zippers. Padded laptop sleeve. Multiple colors available. Ships across Canada. $179.",
+  },
+  {
+    id: "ridgeflex",
+    name: "RidgeFlex Waterproof",
+    price: 195,
+    description:
+      "Northbound Packs RidgeFlex Waterproof — weather-resistant hiking pack. 30L capacity. Reinforced seams. Fits 15\" laptop. Canadian made. $195.",
+  },
+  {
+    id: "summit",
+    name: "Summit Day Pack",
+    price: 149,
+    description:
+      "Northbound Packs Summit Day Pack — lightweight daypack for trails. Breathable back panel. Two side pockets. Ships Canada-wide. $149.",
+  },
+  {
+    id: "trail-lite",
+    name: "Trail Lite",
+    price: 89,
+    description:
+      "Northbound Packs Trail Lite — compact canvas pack. Single main compartment. Perfect for day trips. Made in Ontario. $89.",
+  },
+] as const;
+
+// Keywords driving clicks (GEO page)
+export const KEYWORDS_DRIVING_CLICKS = [
+  { keyword: "waterproof", clicks: 89, color: "green" },
+  { keyword: "handmade", clicks: 76, color: "blue" },
+  { keyword: "Canada made", clicks: 71, color: "red" },
+  { keyword: "durable", clicks: 58, color: "yellow" },
+  { keyword: "28L", clicks: 44, color: "purple" },
+  { keyword: "canvas", clicks: 31, color: "grey" },
+  { keyword: "laptop sleeve", clicks: 28, color: "blue" },
+];
 
 export const ACTIVE_TRIGGERS = [
   { query: "backpack under $200", impressions: 847, trend: "up" as const },
   { query: "Canadian made backpack", impressions: 312, trend: "up" as const },
   { query: "hiking pack Canada", impressions: 201, trend: "up" as const },
   { query: "Jansport alternative", impressions: 156, trend: "down" as const },
+  { query: "waterproof daypack", impressions: 134, trend: "up" as const },
+  { query: "handmade bag Canada", impressions: 98, trend: "up" as const },
 ];
 
 export const CLIP_PERFORMANCE = {

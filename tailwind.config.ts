@@ -9,23 +9,25 @@ const config: Config = {
   theme: {
     extend: {
       colors: {
-        navy: {
-          DEFAULT: "#0A0F1E",
-          card: "#111827",
-          border: "#1F2937",
-        },
-        accent: {
-          red: "#FF0000",
-          green: "#10B981",
-        },
-        text: {
-          primary: "#F9FAFB",
-          secondary: "#9CA3AF",
-        },
+        base: "#050C1A",
+        card: "#0B1628",
+        "card-hover": "#0F1E36",
+        "border-subtle": "#1A2E4A",
+        "border-active": "#C8102E",
+        "text-primary": "#E8EDF5",
+        "text-secondary": "#5A7A9E",
+        "text-muted": "#2E4A6B",
+        "red-primary": "#C8102E",
+        "red-hover": "#E8132F",
+        "red-subtle": "#1A0810",
+        green: "#0EA472",
+        "green-subtle": "#051A12",
+        yellow: "#D4930A",
+        "blue-accent": "#1E6FD4",
       },
       fontFamily: {
-        display: ["var(--font-syne)", "system-ui", "sans-serif"],
-        body: ["var(--font-dm-sans)", "system-ui", "sans-serif"],
+        sans: ["var(--font-geist-sans)", "system-ui", "sans-serif"],
+        mono: ["var(--font-geist-mono)", "ui-monospace", "monospace"],
       },
     },
   },

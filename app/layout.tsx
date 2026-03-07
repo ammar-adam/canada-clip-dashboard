@@ -1,18 +1,9 @@
 import type { Metadata } from "next";
-import { Syne, DM_Sans } from "next/font/google";
+import { GeistSans } from "geist/font/sans";
+import { GeistMono } from "geist/font/mono";
+import { auth0 } from "@/lib/auth0";
+import { Auth0Wrapper } from "@/components/Auth0Wrapper";
 import "./globals.css";
-
-const syne = Syne({
-  variable: "--font-syne",
-  subsets: ["latin"],
-  display: "swap",
-});
-
-const dmSans = DM_Sans({
-  variable: "--font-dm-sans",
-  subsets: ["latin"],
-  display: "swap",
-});
 
 export const metadata: Metadata = {
   title: "CanadaClip Merchant Dashboard",
@@ -20,15 +11,18 @@ export const metadata: Metadata = {
     "Track how many customers you're stealing from big brands via AI-powered App Clips.",
 };
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  const session = await auth0.getSession();
+  const user = session?.user;
+
   return (
-    <html lang="en" className={`${syne.variable} ${dmSans.variable}`}>
-      <body className="font-body bg-navy text-text-primary antialiased">
-        {children}
+    <html lang="en" className={`${GeistSans.variable} ${GeistMono.variable}`}>
+      <body className="font-sans bg-[var(--bg-base)] text-[var(--text-primary)] antialiased">
+        <Auth0Wrapper user={user}>{children}</Auth0Wrapper>
       </body>
     </html>
   );

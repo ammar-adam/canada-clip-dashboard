@@ -1,57 +1,40 @@
 "use client";
 
-import {
-  BarChart,
-  Bar,
-  XAxis,
-  YAxis,
-  Tooltip,
-  ResponsiveContainer,
-  Cell,
-} from "recharts";
-import { COMPETITOR_BREAKDOWN } from "@/lib/mock-data";
+import { useMerchant } from "@/contexts/MerchantContext";
+import { merchantData } from "@/lib/merchantData";
 
 export function CompetitorBreakdown() {
+  const merchantId = useMerchant();
+  const { competitors } = merchantData[merchantId];
+  const maxCount = Math.max(...competitors.map((c) => c.count), 1);
+
   return (
-    <div className="rounded-xl border border-navy-border bg-navy-card p-6">
-      <h2 className="font-display font-bold text-lg text-text-primary mb-4">
+    <div className="rounded-xl border border-[#1A2E4A] bg-[#0B1628] p-6 hover:bg-[#0F1E36] hover:border-[#1E3A5C] transition-all duration-200">
+      <h2 className="text-lg font-semibold text-[#E8EDF5] mb-1">
         Who you&apos;re stealing from
       </h2>
-      <div className="h-[220px]">
-        <ResponsiveContainer width="100%" height="100%">
-          <BarChart
-            layout="vertical"
-            data={COMPETITOR_BREAKDOWN}
-            margin={{ top: 0, right: 24, left: 80, bottom: 0 }}
+      <p className="text-sm text-[#5A7A9E] mb-4">Customer count by intercepted brand</p>
+      <div className="space-y-4">
+        {competitors.map((row) => (
+          <div
+            key={row.name}
+            className="flex items-center gap-3 rounded-lg px-3 py-2 transition-colors hover:bg-[#0F1E36]"
           >
-            <XAxis type="number" hide />
-            <YAxis
-              type="category"
-              dataKey="name"
-              stroke="#9CA3AF"
-              tick={{ fill: "#9CA3AF", fontSize: 12 }}
-              axisLine={false}
-              tickLine={false}
-              width={70}
-            />
-            <Tooltip
-              contentStyle={{
-                backgroundColor: "#111827",
-                border: "1px solid #1F2937",
-                borderRadius: "8px",
-              }}
-              formatter={(value: number, _name: string, props: { payload?: { percent?: number } }) => [
-                `${value} customers (${props.payload?.percent ?? 0}%)`,
-                "Stolen",
-              ]}
-            />
-            <Bar dataKey="customers" radius={[0, 4, 4, 0]} maxBarSize={28}>
-              {COMPETITOR_BREAKDOWN.map((entry, index) => (
-                <Cell key={`cell-${index}`} fill={entry.color} />
-              ))}
-            </Bar>
-          </BarChart>
-        </ResponsiveContainer>
+            <span className="w-24 text-sm text-[#E8EDF5] shrink-0">{row.name}</span>
+            <div className="flex-1 h-2 rounded-full bg-[#132040] overflow-hidden">
+              <div
+                className="h-full rounded-full transition-all duration-300"
+                style={{
+                  width: `${(row.count / maxCount) * 100}%`,
+                  backgroundColor: row.color,
+                }}
+              />
+            </div>
+            <span className="w-20 text-right text-sm text-[#5A7A9E] tabular-nums shrink-0">
+              {row.count}
+            </span>
+          </div>
+        ))}
       </div>
     </div>
   );

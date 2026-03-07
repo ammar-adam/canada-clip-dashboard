@@ -8,82 +8,89 @@ import {
   CartesianGrid,
   Tooltip,
   ResponsiveContainer,
-  Cell,
+  Legend,
 } from "recharts";
-import { WEEKLY_STOLEN, COMPETITOR_BREAKDOWN } from "@/lib/mock-data";
+import { useMerchant } from "@/contexts/MerchantContext";
+import { merchantData } from "@/lib/merchantData";
 
-const brandColors: Record<string, string> = {
-  Jansport: "#FF6B6B",
-  Herschel: "#4ECDC4",
-  "North Face": "#45B7D1",
-  Others: "#96CEB4",
+const FALLBACK_COLORS: Record<string, string> = {
+  Jansport: "#C8102E",
+  Herschel: "#0EA472",
+  "North Face": "#1E6FD4",
+  Others: "#2E4A6B",
+  Supreme: "#C8102E",
+  Stussy: "#0EA472",
+  Palace: "#1E6FD4",
+  Anker: "#C8102E",
+  Belkin: "#0EA472",
+  Mophie: "#1E6FD4",
+  Samsung: "#D4930A",
+  REI: "#D4930A",
+  MEC: "#8B5CF6",
+  Carhartt: "#D4930A",
+  "Nike SB": "#8B5CF6",
 };
 
 export function StolenCustomersChart() {
-  const data = WEEKLY_STOLEN.map((d) => ({
-    ...d,
-    fill: brandColors[d.brand] ?? "#96CEB4",
-  }));
+  const merchantId = useMerchant();
+  const { weeklyStolen, competitors } = merchantData[merchantId];
+  const colorMap: Record<string, string> = {};
+  competitors.forEach((c) => {
+    colorMap[c.name] = c.color;
+  });
+  const barKeys = weeklyStolen.length
+    ? (Object.keys(weeklyStolen[0]).filter((k) => k !== "day") as string[])
+    : [];
 
   return (
-    <div className="rounded-xl border border-navy-border bg-navy-card p-6 mb-8">
-      <h2 className="font-display font-bold text-lg text-text-primary mb-4">
-        Customers stolen from big brands (last 7 days)
+    <div className="rounded-xl border border-[#1A2E4A] bg-[#0B1628] p-6 mb-8 hover:bg-[#0F1E36] hover:border-[#1E3A5C] transition-all duration-200">
+      <h2 className="text-lg font-semibold text-[#E8EDF5]">
+        Customers stolen from big brands
       </h2>
-      <div className="h-[320px]">
+      <p className="text-sm text-[#5A7A9E] mt-0.5">Last 7 days</p>
+      <div className="h-[280px] mt-4">
         <ResponsiveContainer width="100%" height="100%">
           <BarChart
-            data={data}
+            data={weeklyStolen}
             margin={{ top: 12, right: 12, left: 0, bottom: 0 }}
           >
-            <CartesianGrid strokeDasharray="3 3" stroke="#1F2937" />
+            <CartesianGrid strokeDasharray="3 3" stroke="#1A2E4A" vertical={false} />
             <XAxis
               dataKey="day"
-              stroke="#9CA3AF"
-              tick={{ fill: "#9CA3AF", fontSize: 12 }}
-              axisLine={{ stroke: "#1F2937" }}
+              tick={{ fill: "#5A7A9E", fontSize: 12 }}
+              axisLine={{ stroke: "#1A2E4A" }}
+              tickLine={false}
             />
             <YAxis
-              stroke="#9CA3AF"
-              tick={{ fill: "#9CA3AF", fontSize: 12 }}
-              axisLine={{ stroke: "#1F2937" }}
-              tickLine={{ stroke: "#1F2937" }}
+              tick={{ fill: "#5A7A9E", fontSize: 12 }}
+              axisLine={false}
+              tickLine={false}
             />
             <Tooltip
               contentStyle={{
-                backgroundColor: "#111827",
-                border: "1px solid #1F2937",
+                backgroundColor: "#0F1E36",
+                border: "1px solid #1A2E4A",
                 borderRadius: "8px",
               }}
-              labelStyle={{ color: "#F9FAFB" }}
-              itemStyle={{ color: "#9CA3AF" }}
-              formatter={(value: number, _name: string, props: { payload?: { brand?: string } }) => [
-                `${value} stolen from ${props.payload?.brand ?? "—"}`,
-                "Customers",
-              ]}
-              labelFormatter={(label) => `Day: ${label}`}
+              labelStyle={{ color: "#E8EDF5" }}
+              itemStyle={{ color: "#5A7A9E" }}
             />
-            <Bar dataKey="stolen" name="Customers" radius={[4, 4, 0, 0]}>
-              {data.map((entry, index) => (
-                <Cell key={`cell-${index}`} fill={entry.fill} />
-              ))}
-            </Bar>
+            <Legend
+              wrapperStyle={{ paddingTop: "12px" }}
+              formatter={(value) => (
+                <span className="text-[#5A7A9E] text-sm">{value}</span>
+              )}
+            />
+            {barKeys.map((key) => (
+              <Bar
+                key={key}
+                dataKey={key}
+                fill={colorMap[key] ?? FALLBACK_COLORS[key] ?? "#2E4A6B"}
+                radius={[4, 4, 0, 0]}
+              />
+            ))}
           </BarChart>
         </ResponsiveContainer>
-      </div>
-      <div className="flex flex-wrap gap-4 mt-4 pt-4 border-t border-navy-border">
-        {COMPETITOR_BREAKDOWN.map((c) => (
-          <span
-            key={c.name}
-            className="flex items-center gap-2 text-sm text-text-secondary"
-          >
-            <span
-              className="w-3 h-3 rounded-full"
-              style={{ backgroundColor: c.color }}
-            />
-            {c.name}
-          </span>
-        ))}
       </div>
     </div>
   );
