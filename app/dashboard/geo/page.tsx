@@ -38,7 +38,8 @@ export default function GeoPage() {
   const [suggestedRewrite, setSuggestedRewrite] = useState("");
   const [rewriteAccepted, setRewriteAccepted] = useState(false);
   const [rewriteLoading, setRewriteLoading] = useState(false);
-  const [savingToSupabase, setSavingToSupabase] = useState(false);
+  type SaveState = "idle" | "saving" | "success" | "error";
+  const [saveState, setSaveState] = useState<SaveState>("idle");
   const [toast, setToast] = useState<{ message: string; success: boolean } | null>(null);
   const [keywordPanelPayload, setKeywordPanelPayload] = useState<PanelPayload>(null);
   const [geoScore, setGeoScore] = useState(34);
@@ -79,28 +80,24 @@ export default function GeoPage() {
 
   async function handleSaveToSupabase() {
     if (!suggestedRewrite) return;
-    setSavingToSupabase(true);
+    setSaveState("saving");
     setToast(null);
     try {
       const res = await fetch("/api/update-listing", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          merchant_id: merchantId,
-          product_name: selectedProduct,
+          productId: "city-pack-28l",
           description: suggestedRewrite,
         }),
       });
-      const result = await res.json();
-      if (res.ok && result.success) {
-        setToast({ message: "Your listing has been updated ✓", success: true });
-      } else {
-        setToast({ message: "Save failed — check Supabase connection", success: false });
-      }
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error);
+      setSaveState("success");
+      setToast({ message: "Your listing has been updated ✓", success: true });
     } catch {
+      setSaveState("error");
       setToast({ message: "Save failed — check Supabase connection", success: false });
-    } finally {
-      setSavingToSupabase(false);
     }
   }
 
@@ -165,13 +162,13 @@ export default function GeoPage() {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          merchant_id: merchantId,
-          product_name: selectedProduct,
+          productId: "city-pack-28l",
           description: optimizedListing,
         }),
       });
-      const result = await res.json();
-      if (res.ok && result.success) setApplySuccess(true);
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error);
+      setApplySuccess(true);
     } finally {
       setApplying(false);
     }
@@ -308,6 +305,7 @@ export default function GeoPage() {
                 }
                 setShowRewritePanel(true);
                 setRewriteAccepted(false);
+                setSaveState("idle");
               }}
               disabled={rewriteLoading}
               className="inline-flex items-center gap-2 rounded-lg bg-[var(--brand-red)] text-white font-semibold px-4 py-2.5 border border-[var(--border)] transition-colors duration-150 hover:opacity-90 disabled:opacity-50"
@@ -356,11 +354,30 @@ export default function GeoPage() {
                   <button
                     type="button"
                     onClick={handleSaveToSupabase}
-                    disabled={savingToSupabase}
-                    className="inline-flex items-center gap-2 rounded-lg bg-[var(--accent)] text-[var(--bg)] font-semibold px-4 py-2 border border-[var(--border)] disabled:opacity-50 disabled:cursor-not-allowed transition-colors duration-150 hover:shadow-[0_0_0_1px_rgba(255,255,255,0.12)]"
+                    disabled={saveState === "saving" || saveState === "success"}
+                    className={`inline-flex items-center gap-2 rounded-lg font-semibold px-4 py-2 border transition-colors duration-150 disabled:cursor-not-allowed ${
+                      saveState === "success"
+                        ? "bg-green-500/20 text-green-400 border-green-500/50"
+                        : saveState === "error"
+                          ? "bg-[var(--brand-red)]/20 text-[var(--brand-red)] border-[var(--brand-red)]"
+                          : "bg-[var(--accent)] text-[var(--bg)] border-[var(--border)] hover:shadow-[0_0_0_1px_rgba(255,255,255,0.12)] disabled:opacity-50"
+                    }`}
                   >
-                    <Save className="w-4 h-4" />
-                    {savingToSupabase ? "Saving…" : "Add this to my website"}
+                    {saveState === "saving" ? (
+                      <>
+                        <span className="inline-block w-4 h-4 border-2 border-current border-t-transparent rounded-full animate-spin" />
+                        Saving…
+                      </>
+                    ) : saveState === "success" ? (
+                      "✓ Live on your website"
+                    ) : saveState === "error" ? (
+                      "Save failed — try again"
+                    ) : (
+                      <>
+                        <Save className="w-4 h-4" />
+                        💾 Add this to my website
+                      </>
+                    )}
                   </button>
                   {toast && (
                     <p className={`mt-3 text-sm font-mono ${toast.success ? "text-[var(--brand-blue)]" : "text-[var(--brand-red)]"}`}>

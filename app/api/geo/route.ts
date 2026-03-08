@@ -38,6 +38,13 @@ ${listing}`;
 
 const DEEPSEEK_MODEL = "deepseek-chat";
 
+function normalizeImpact(s: string): "High" | "Medium" | "Low" {
+  const lower = s.toLowerCase();
+  if (lower === "high") return "High";
+  if (lower === "low") return "Low";
+  return "Medium";
+}
+
 function parseGeoResponse(text: string): {
   suggestions: GeoSuggestion[];
   optimizedListing: string;
@@ -50,12 +57,15 @@ function parseGeoResponse(text: string): {
   }
   const parsed = JSON.parse(raw);
   const rawSuggestions = Array.isArray(parsed.suggestions) ? parsed.suggestions : [];
-  const suggestions: GeoSuggestion[] = rawSuggestions.map((s: Record<string, unknown>) => ({
-    issue: typeof s.title === "string" ? s.title : typeof s.issue === "string" ? s.issue : "Suggestion",
-    why: typeof s.description === "string" ? s.description : typeof s.why === "string" ? s.why : "",
-    fix: typeof s.fix === "string" ? s.fix : "",
-    impact: (typeof s.severity === "string" ? s.severity : typeof s.impact === "string" ? s.impact : "Medium") as "High" | "Medium" | "Low",
-  }));
+  const suggestions: GeoSuggestion[] = rawSuggestions.map((s: Record<string, unknown>) => {
+    const severityRaw = typeof s.severity === "string" ? s.severity : typeof s.impact === "string" ? s.impact : "Medium";
+    return {
+      issue: typeof s.title === "string" ? s.title : typeof s.issue === "string" ? s.issue : "Suggestion",
+      why: typeof s.description === "string" ? s.description : typeof s.why === "string" ? s.why : "",
+      fix: typeof s.fix === "string" ? s.fix : "",
+      impact: normalizeImpact(severityRaw),
+    };
+  });
   const optimizedListing =
     typeof parsed.optimized_listing === "string"
       ? parsed.optimized_listing.trim()
@@ -132,15 +142,28 @@ export async function POST(req: Request) {
     }
 
     const data = await res.json();
-    const text = data.choices?.[0]?.message?.content;
-    if (!text) {
+    const content = data.choices?.[0]?.message?.content;
+    const text = typeof content === "string" ? content : Array.isArray(content) ? content.map((p: { text?: string }) => p?.text ?? "").join("") : "";
+    if (!text || !text.trim()) {
+      console.warn("GEO API: DeepSeek returned empty content", { hasChoices: !!data.choices?.[0] });
       return NextResponse.json(
-        { error: "Empty response from model" },
+        { error: "Empty response from model", message: "The model returned no content. Try again." },
         { status: 502 }
       );
     }
 
-    const parsed = parseGeoResponse(text);
+    let parsed: ReturnType<typeof parseGeoResponse>;
+    try {
+      parsed = parseGeoResponse(text);
+    } catch (parseErr) {
+      const msg = parseErr instanceof Error ? parseErr.message : String(parseErr);
+      console.warn("GEO API: Failed to parse model JSON", msg, "raw preview:", text.slice(0, 400));
+      return NextResponse.json(
+        { error: "Invalid model response", message: "The model returned invalid JSON. Try again." },
+        { status: 502 }
+      );
+    }
+
     if (parsed.suggestions.length > 0) {
       suggestions = parsed.suggestions;
       optimizedListing = parsed.optimizedListing;
@@ -156,9 +179,14 @@ export async function POST(req: Request) {
         { status: 503 }
       );
     }
+    return NextResponse.json(
+      { error: "Analysis failed", message: err.message },
+      { status: 503 }
+    );
   }
 
-  if (suggestions.length === 0) {
+  const usedFallback = suggestions.length === 0;
+  if (usedFallback) {
     const fallback: GeoSuggestion[] = [
       { issue: "Missing price signals", why: "LLMs prioritize listings with clear pricing.", fix: "Add price to the first sentence, e.g. 'Starting at $89.'", impact: "High" },
       { issue: "Vague descriptors", why: "Generic terms like 'quality' are not searchable.", fix: "Use specific materials and features, e.g. 'YKK zippers, 28L capacity'.", impact: "Medium" },
@@ -185,5 +213,11 @@ export async function POST(req: Request) {
     }
   }
 
-  return NextResponse.json({ suggestions, optimizedListing, geoScore, projectedScore });
+  return NextResponse.json({
+    suggestions,
+    optimizedListing,
+    geoScore,
+    projectedScore,
+    source: usedFallback ? "fallback" : "model",
+  });
 }
