@@ -32,7 +32,7 @@ function MapleLeafIcon({ className }: { className?: string }) {
 export function ClipPreviewMockup() {
   const merchantId = useMerchant();
   const data = merchantData[merchantId];
-  const { image, productName, price, sourceDomain, placeholderUrl } = data.clipPreview;
+  const { image, productName, price, sourceDomain, triggerUrl } = data.clipPreview;
   const [imgSrc, setImgSrc] = useState(image);
 
   return (
@@ -59,15 +59,14 @@ export function ClipPreviewMockup() {
           <div className="absolute inset-[6px] rounded-[40px] overflow-hidden bg-[#f2f2f2] flex flex-col">
             {/* Header */}
             <div className="px-4 pt-6 pb-2 bg-white">
-              <h3 className="text-base font-bold text-black">Canadian Alternatives</h3>
+              <h3 className="text-base font-bold text-[#171717]">Canadian Alternatives</h3>
               <p className="text-xs text-[#6b7280] mt-0.5">Source: {sourceDomain}</p>
               <div className="flex gap-2 mt-3">
                 <input
                   type="text"
                   readOnly
-                  value=""
-                  placeholder={placeholderUrl}
-                  className="flex-1 min-w-0 rounded-lg border border-[#e5e7eb] bg-[#f9fafb] px-3 py-2 text-[10px] text-[#6b7280] placeholder:text-[#9ca3af]"
+                  value={triggerUrl}
+                  className="flex-1 min-w-0 rounded-lg border border-[#e5e7eb] bg-[#f9fafb] px-3 py-2 text-[10px] text-[#374151] truncate"
                 />
                 <button
                   type="button"
@@ -90,7 +89,7 @@ export function ClipPreviewMockup() {
                   onError={() => setImgSrc(FALLBACK_IMAGES[merchantId])}
                 />
               </div>
-              <p className="text-sm font-bold text-black mt-2 text-center">{productName}</p>
+              <p className="text-sm font-bold text-[#171717] mt-2 text-center">{productName}</p>
               <div className="flex items-center justify-center gap-1.5 mt-1 flex-wrap">
                 <span className="text-xs text-[#6b7280]">{data.business}</span>
                 <span className="inline-flex items-center gap-0.5 rounded-full border border-white bg-[#22c55e] px-2 py-0.5 text-[10px] font-medium text-white">
@@ -98,7 +97,7 @@ export function ClipPreviewMockup() {
                   Local
                 </span>
               </div>
-              <p className="text-sm font-bold text-black mt-1 text-center tabular-nums">{price}</p>
+              <p className="text-sm font-bold text-[#171717] mt-1 text-center tabular-nums">{price}</p>
               <button
                 type="button"
                 className="mt-3 w-full rounded-xl bg-[#C8102E] flex items-center justify-center gap-2 py-2.5 text-sm font-bold text-white"
@@ -114,7 +113,7 @@ export function ClipPreviewMockup() {
                 <Paperclip className="w-5 h-5 text-white" strokeWidth={2} />
               </div>
               <div className="flex-1 min-w-0">
-                <p className="text-xs font-bold text-black">App Clip Preview</p>
+                <p className="text-xs font-bold text-[#171717]">App Clip Preview</p>
                 <p className="text-[10px] text-[#6b7280]">Get the full app experience</p>
               </div>
               <button

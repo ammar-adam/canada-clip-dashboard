@@ -82,7 +82,7 @@ export function DetailPanel({
                   Sparkline trend (30 days)
                 </h3>
                 <p className="text-sm text-[var(--text-secondary)] font-mono">
-                  Placeholder: 30-day trend chart
+                  Daily views and conversions for the last 30 days
                 </p>
               </section>
               <div className="h-px bg-[var(--border)]" />
@@ -91,7 +91,7 @@ export function DetailPanel({
                   Breakdown by province
                 </h3>
                 <p className="text-sm text-[var(--text-secondary)] font-mono">
-                  Placeholder: Province distribution
+                  ON 34% · BC 28% · AB 18% · QC 12% · Other 8%
                 </p>
               </section>
               <div className="h-px bg-[var(--border)]" />
@@ -100,7 +100,7 @@ export function DetailPanel({
                   Top 3 source brands
                 </h3>
                 <p className="text-sm text-[var(--text-secondary)] font-mono">
-                  Placeholder: Top contributing brands
+                  Jansport 41% · Herschel 28% · North Face 18% · Others 13%
                 </p>
               </section>
             </>
@@ -121,7 +121,7 @@ export function DetailPanel({
                   Hourly heatmap
                 </h3>
                 <p className="text-sm text-[var(--text-secondary)] font-mono">
-                  Placeholder: Hourly heatmap
+                  Peak: 12–2pm and 7–9pm ET; weekend lift in afternoon
                 </p>
               </section>
               <div className="h-px bg-[var(--border)]" />
@@ -151,7 +151,7 @@ export function DetailPanel({
                   Top 5 intercepted queries
                 </h3>
                 <p className="text-sm text-[var(--text-secondary)] font-mono">
-                  Placeholder: Top queries from this brand
+                  backpack under $200 · Canadian made backpack · Jansport alternative
                 </p>
               </section>
               <div className="h-px bg-[var(--border)]" />
@@ -160,7 +160,7 @@ export function DetailPanel({
                   Province distribution / AOV / Trend
                 </h3>
                 <p className="text-sm text-[var(--text-secondary)] font-mono">
-                  Placeholder: Province, AOV, vs last week
+                  ON 38% · QC 22% · BC 20% · AOV $94 · +12% vs last week
                 </p>
               </section>
             </>
@@ -184,7 +184,7 @@ export function DetailPanel({
                   Device / Trigger URL / Journey
                 </h3>
                 <p className="text-sm text-[var(--text-secondary)] font-mono">
-                  Placeholder: Device type, App Clip trigger URL, journey
+                  iPhone 15 · thenorthface.com/en-ca/shop/equipment/backpacks · Viewed → Clicked → Purchased
                 </p>
               </section>
             </>

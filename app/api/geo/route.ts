@@ -76,8 +76,10 @@ export async function POST(req: Request) {
         : [];
     const optimizedListing: string =
       typeof parsed.optimized_listing === "string"
-        ? parsed.optimized_listing
-        : "";
+        ? parsed.optimized_listing.trim()
+        : typeof parsed.optimizedListing === "string"
+          ? parsed.optimizedListing.trim()
+          : "";
 
     if (suggestions.length === 0) {
       return NextResponse.json(
@@ -89,7 +91,6 @@ export async function POST(req: Request) {
     return NextResponse.json({ suggestions, optimizedListing });
   } catch (e) {
     console.error("GEO API error:", e);
-    // Fallback so demo never breaks
     const fallback: GeoSuggestion[] = [
       { issue: "Missing price signals", why: "LLMs prioritize listings with clear pricing.", fix: "Add price to the first sentence, e.g. 'Starting at $89.'", impact: "High" },
       { issue: "Vague descriptors", why: "Generic terms like 'quality' are not searchable.", fix: "Use specific materials and features, e.g. 'YKK zippers, 28L capacity'.", impact: "Medium" },
@@ -97,7 +98,7 @@ export async function POST(req: Request) {
     ];
     return NextResponse.json({
       suggestions: fallback,
-      optimizedListing: "Your improved listing will appear here. Add price, materials, and Canadian shipping to your description.",
+      optimizedListing: "",
     });
   }
 }

@@ -58,17 +58,19 @@ export default function GeoPage() {
       if (!res.ok) {
         setError(result.error || "Analysis failed");
         setSuggestions(FALLBACK_SUGGESTIONS);
+        setOptimizedListing("");
         setAnalysisDone(true);
         return;
       }
 
       setSuggestions(result.suggestions || FALLBACK_SUGGESTIONS);
-      setOptimizedListing(result.optimizedListing || "");
+      setOptimizedListing(typeof result.optimizedListing === "string" ? result.optimizedListing.trim() : "");
       setAnalysisDone(true);
       setTimeout(() => setShowProjected(true), 2500);
     } catch (e) {
       setError(e instanceof Error ? e.message : "Request failed");
       setSuggestions(FALLBACK_SUGGESTIONS);
+      setOptimizedListing("");
       setAnalysisDone(true);
     } finally {
       setLoading(false);
@@ -135,7 +137,7 @@ export default function GeoPage() {
           onChange={(e) => setListing(e.target.value)}
           rows={5}
           className="w-full rounded-xl border border-[var(--border)] bg-[var(--surface)] text-[var(--text-primary)] p-4 text-sm font-mono min-h-32 focus:border-[var(--accent)] focus:ring-0 focus:outline-none transition-colors duration-150 placeholder:text-[var(--text-secondary)]"
-          placeholder="Product description..."
+          placeholder="Paste your product or listing text here for GEO suggestions (e.g. title, description, bullet points)"
         />
         <button
           onClick={handleAnalyze}
