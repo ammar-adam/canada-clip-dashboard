@@ -5,7 +5,7 @@ export async function POST(req: Request) {
   const supabase = createServerClient();
   if (!supabase) {
     return NextResponse.json(
-      { error: "Supabase not configured" },
+      { success: false, error: "Supabase not configured" },
       { status: 503 }
     );
   }
@@ -15,7 +15,7 @@ export async function POST(req: Request) {
     const { merchant_id, product_name, description } = body;
     if (!merchant_id || !product_name || description == null) {
       return NextResponse.json(
-        { error: "Missing merchant_id, product_name, or description" },
+        { success: false, error: "Missing merchant_id, product_name, or description" },
         { status: 400 }
       );
     }
@@ -36,7 +36,7 @@ export async function POST(req: Request) {
 
     if (error) {
       console.error("update-listing error:", error);
-      return NextResponse.json({ error: error.message }, { status: 500 });
+      return NextResponse.json({ success: false, error: error.message }, { status: 500 });
     }
     return NextResponse.json({
       success: true,
@@ -45,7 +45,7 @@ export async function POST(req: Request) {
   } catch (e) {
     console.error("update-listing API error:", e);
     return NextResponse.json(
-      { error: e instanceof Error ? e.message : "Request failed" },
+      { success: false, error: e instanceof Error ? e.message : "Request failed" },
       { status: 500 }
     );
   }

@@ -1,5 +1,6 @@
 "use client";
 
+import { useState } from "react";
 import Image from "next/image";
 import { useMerchant } from "@/contexts/MerchantContext";
 import { merchantData } from "@/lib/merchantData";
@@ -8,6 +9,8 @@ export function ClipPreviewMockup() {
   const merchantId = useMerchant();
   const data = merchantData[merchantId];
   const { image, productName, price } = data.clipPreview;
+  const [engravingOn, setEngravingOn] = useState(false);
+  const [engravingText, setEngravingText] = useState("");
 
   return (
     <div className="rounded-xl border border-[#1A2E4A] bg-[#0B1628] p-6">
@@ -70,9 +73,10 @@ export function ClipPreviewMockup() {
                   (c, i) => (
                     <div
                       key={c}
-                      className="w-5 h-5 rounded-full border-2 border-[#0B1628]"
+                      className="w-5 h-5 rounded-full border-2 flex-shrink-0"
                       style={{
                         backgroundColor: c,
+                        borderColor: i === 1 ? "#C8102E" : "#0B1628",
                         boxShadow: i === 1 ? "0 0 0 2px #C8102E" : undefined,
                       }}
                     />
@@ -93,17 +97,38 @@ export function ClipPreviewMockup() {
                   </span>
                 ))}
               </div>
-              <div className="flex items-center justify-between">
-                <span className="text-[10px] text-[#5A7A9E]">Add engraving</span>
-                <div className="w-8 h-4 rounded-full bg-[#C8102E] p-0.5">
-                  <div className="w-3 h-3 rounded-full bg-white translate-x-0.5" />
+              <div>
+                <div className="flex items-center justify-between">
+                  <span className="text-[10px] text-[#5A7A9E]">Add engraving</span>
+                  <button
+                    type="button"
+                    onClick={() => setEngravingOn((v) => !v)}
+                    className="w-8 h-4 rounded-full p-0.5 transition-colors"
+                    style={{
+                      backgroundColor: engravingOn ? "#C8102E" : "#1A2E4A",
+                    }}
+                  >
+                    <div
+                      className="w-3 h-3 rounded-full bg-[#E8EDF5] transition-transform"
+                      style={{ transform: engravingOn ? "translateX(18px)" : "translateX(2px)" }}
+                    />
+                  </button>
                 </div>
+                {engravingOn && (
+                  <input
+                    type="text"
+                    value={engravingText}
+                    onChange={(e) => setEngravingText(e.target.value)}
+                    placeholder="Engraving text..."
+                    className="mt-2 w-full rounded-lg border border-[#1A2E4A] bg-[#0B1628] text-[#E8EDF5] text-[10px] px-2 py-1.5 focus:border-[#C8102E] focus:outline-none"
+                  />
+                )}
               </div>
             </div>
             <div className="mt-auto mx-3 mb-3">
               <button
                 type="button"
-                className="w-full rounded-xl bg-[#C8102E] text-white text-xs font-semibold py-2 text-center"
+                className="w-full rounded-xl bg-[#C8102E] hover:bg-[#0F1E36] text-white text-xs font-semibold py-2 text-center border border-[#1A2E4A]"
               >
                 Visit Store →
               </button>

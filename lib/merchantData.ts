@@ -1,4 +1,4 @@
-export type MerchantId = "backpack" | "streetwear" | "electronics";
+export type MerchantId = "backpack" | "streetwear" | "electronics" | "shawarma";
 
 export type MerchantConfig = {
   email: string;
@@ -32,6 +32,14 @@ export const MERCHANT_CONFIG: Record<MerchantId, MerchantConfig> = {
     province: "British Columbia",
     product_category: "Consumer electronics accessories",
     primary_competitor: "Anker",
+    accent_color: "#C8102E",
+  },
+  shawarma: {
+    email: "shawarma@canadaclip.ca",
+    business: "Shawarma Palace",
+    province: "Ontario",
+    product_category: "Restaurant / Food",
+    primary_competitor: "McDonald's",
     accent_color: "#C8102E",
   },
 };
@@ -157,7 +165,7 @@ export const merchantData: Record<MerchantId, MerchantData> = {
       productName: "City Pack 28L",
       price: "$179",
     },
-    website: "https://northbound-packs.vercel.app",
+    website: "https://northbound-backpacks.vercel.app",
   },
   streetwear: {
     business: "StreetRoot Co",
@@ -285,6 +293,67 @@ export const merchantData: Record<MerchantId, MerchantData> = {
     },
     website: "https://northtech-goods.vercel.app",
   },
+  shawarma: {
+    business: "Shawarma Palace",
+    province: "Ontario",
+    stats: { stolen: 156, views: 982, conversionRate: 15.9, revenue: 2840 },
+    competitors: [
+      { name: "McDonald's", count: 52, color: "#C8102E" },
+      { name: "Subway", count: 38, color: "#0EA472" },
+      { name: "Tim Hortons", count: 31, color: "#1E6FD4" },
+      { name: "Pita Pit", count: 18, color: "#D4930A" },
+      { name: "Others", count: 17, color: "#2E4A6B" },
+    ],
+    products: [
+      "Classic Shawarma Plate ($14)",
+      "Falafel Wrap ($12)",
+      "Family Pack ($42)",
+      "Garlic Sauce 500ml ($6)",
+    ],
+    productDescriptions: {
+      "Classic Shawarma Plate ($14)": "Shawarma Palace Classic Shawarma Plate — tender beef or chicken, fresh veggies, rice, and house garlic sauce. Halal. Made in Ontario. $14.",
+      "Falafel Wrap ($12)": "Shawarma Palace Falafel Wrap — crispy falafel, hummus, pickles. $12.",
+      "Family Pack ($42)": "Shawarma Palace Family Pack — feeds 4. Choice of protein. $42.",
+      "Garlic Sauce 500ml ($6)": "Shawarma Palace Garlic Sauce 500ml — our famous recipe. $6.",
+    },
+    keywords: {
+      "Classic Shawarma Plate ($14)": [
+        { word: "halal", views: 198, clicks: 72, purchases: 28 },
+        { word: "shawarma", views: 245, clicks: 89, purchases: 34 },
+        { word: "Canadian", views: 134, clicks: 51, purchases: 19 },
+        { word: "garlic sauce", views: 112, clicks: 44, purchases: 17 },
+        { word: "plate", views: 98, clicks: 38, purchases: 14 },
+        { word: "Ontario", views: 87, clicks: 31, purchases: 12 },
+      ],
+    },
+    triggers: [
+      { query: "shawarma near me", impressions: 445, trend: "up" },
+      { query: "halal food Canada", impressions: 312, trend: "up" },
+      { query: "best shawarma Ontario", impressions: 198, trend: "up" },
+      { query: "McDonald's alternative", impressions: 134, trend: "down" },
+    ],
+    activityFeed: [
+      { time: "just now", query: "shawarma plate delivery", intercepted: "McDonalds.com", action: "Purchased", province: "ON" },
+      { time: "2 min ago", query: "halal restaurant", intercepted: "Subway.com", action: "Clicked", province: "QC" },
+      { time: "4 min ago", query: "best garlic sauce", intercepted: "PitaPit.com", action: "Viewed", province: "ON" },
+      { time: "6 min ago", query: "family pack food", intercepted: "TimHortons.com", action: "Purchased", province: "BC" },
+    ],
+    weeklyStolen: [
+      { day: "Mon", "McDonald's": 8, Subway: 5, "Tim Hortons": 4, Others: 2 },
+      { day: "Tue", "McDonald's": 10, Subway: 6, "Tim Hortons": 5, Others: 3 },
+      { day: "Wed", "McDonald's": 9, Subway: 6, "Tim Hortons": 4, Others: 2 },
+      { day: "Thu", "McDonald's": 12, Subway: 8, "Tim Hortons": 6, Others: 3 },
+      { day: "Fri", "McDonald's": 11, Subway: 7, "Tim Hortons": 5, Others: 4 },
+      { day: "Sat", "McDonald's": 14, Subway: 9, "Tim Hortons": 7, Others: 4 },
+      { day: "Sun", "McDonald's": 7, Subway: 5, "Tim Hortons": 3, Others: 2 },
+    ],
+    clipPreview: {
+      image: "https://images.unsplash.com/photo-1529006557810-274b9b2fc783?w=200",
+      productName: "Classic Shawarma Plate",
+      price: "$14",
+    },
+    website: "https://shawarma-palace.vercel.app",
+  },
 };
 
 export function getMerchantIdFromEmail(email: string): MerchantId | null {
@@ -299,5 +368,6 @@ export function getMerchantFromEmail(email: string): MerchantId {
   if (email === "backpack@canadaclip.ca") return "backpack";
   if (email === "streetwear@canadaclip.ca") return "streetwear";
   if (email === "electronics@canadaclip.ca") return "electronics";
+  if (email === "shawarma@canadaclip.ca") return "shawarma";
   return "backpack";
 }

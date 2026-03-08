@@ -22,7 +22,7 @@ export function HeroStatRow() {
       delta: "+18 this week",
       color: "red" as const,
       icon: "target" as const,
-      className: "bg-[#0F0812] border-[#2A1020] hover:bg-[#1A0810] hover:border-[#3A1830]",
+      className: "bg-[#1A0A0C] border-[#2E1418] hover:bg-[#0F1E36] hover:border-[#1A2E4A]",
       valueClassName: "text-4xl font-bold tabular-nums text-[#C8102E]",
       deltaClassName: "text-[#C8102E]",
     },

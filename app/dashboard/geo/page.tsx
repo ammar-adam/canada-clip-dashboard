@@ -80,7 +80,6 @@ export default function GeoPage() {
     setApplying(true);
     setApplySuccess(false);
     try {
-      await new Promise((r) => setTimeout(r, 1000));
       const res = await fetch("/api/update-listing", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -139,7 +138,7 @@ export default function GeoPage() {
         <button
           onClick={handleAnalyze}
           disabled={loading}
-          className="mt-4 inline-flex items-center gap-2 rounded-lg bg-[#C8102E] hover:bg-[#E8132F] text-white font-semibold px-4 py-2 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+          className="mt-4 inline-flex items-center gap-2 rounded-lg bg-[#C8102E] hover:bg-[#0F1E36] text-white font-semibold px-4 py-2 border border-[#1A2E4A] disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
         >
           <Sparkles className="w-4 h-4" />
           {loading ? "Analyzing…" : "Analyze with Gemini AI"}
@@ -179,7 +178,7 @@ export default function GeoPage() {
                 <button
                   onClick={handleApplyToWebsite}
                   disabled={applying}
-                  className="inline-flex items-center gap-2 rounded-lg bg-[#0EA472] hover:bg-[#12C285] text-white font-semibold px-4 py-2 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                  className="inline-flex items-center gap-2 rounded-lg bg-[#C8102E] hover:bg-[#0F1E36] text-white font-semibold px-4 py-2 border border-[#1A2E4A] disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
                 >
                   {applying ? (
                     <>Updating your website…</>
@@ -197,7 +196,7 @@ export default function GeoPage() {
                       href={data.website}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="underline font-medium"
+                      className="underline font-medium text-[#0EA472]"
                     >
                       View live on {data.website.replace(/^https?:\/\//, "")} →
                     </a>

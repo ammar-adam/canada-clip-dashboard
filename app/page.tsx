@@ -4,5 +4,5 @@ import { redirect } from "next/navigation";
 export default async function Home() {
   const session = await auth0.getSession();
   if (session?.user) redirect("/dashboard");
-  redirect("/login");
+  redirect("/auth/login");
 }

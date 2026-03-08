@@ -21,7 +21,7 @@ export default async function RootLayout({
 
   return (
     <html lang="en" className={`${GeistSans.variable} ${GeistMono.variable}`}>
-      <body className="font-sans bg-[var(--bg-base)] text-[var(--text-primary)] antialiased">
+      <body className="font-sans bg-[var(--bg-base)] text-[var(--text-primary)] antialiased overflow-x-hidden">
         <Auth0Wrapper user={user}>{children}</Auth0Wrapper>
       </body>
     </html>

@@ -124,7 +124,7 @@ export function ActivityFeed({
               <tr
                 key={row.id}
                 className={`border-b border-[#1A2E4A]/80 transition-colors hover:bg-[#0F1E36] ${
-                  i === 0 ? "animate-pulse bg-[#C8102E]/5" : ""
+                  i === 0 ? "animate-[fadeIn_0.3s_ease-out_forwards] bg-[#C8102E]/5" : ""
                 }`}
               >
                 <td className="py-3 text-[#5A7A9E]">{row.time}</td>

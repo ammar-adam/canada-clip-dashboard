@@ -16,7 +16,7 @@ export default async function LoginPage() {
         </p>
         <a
           href="/auth/login"
-          className="bg-[#C8102E] hover:bg-[#E8132F] text-white rounded-lg px-6 py-3 mt-8 block text-center w-full max-w-xs"
+          className="bg-[#C8102E] hover:bg-[#0F1E36] text-white rounded-lg px-6 py-3 mt-8 block text-center w-full max-w-xs border border-[#1A2E4A]"
         >
           Sign in to your dashboard
         </a>
@@ -29,6 +29,9 @@ export default async function LoginPage() {
           </div>
           <div className="bg-[#0B1628] border border-[#1A2E4A] rounded-xl p-3 text-xs text-[#5A7A9E]">
             NorthTech Goods — British Columbia — Electronics
+          </div>
+          <div className="bg-[#0B1628] border border-[#1A2E4A] rounded-xl p-3 text-xs text-[#5A7A9E]">
+            Shawarma Palace — Ontario — Restaurant / Food
           </div>
         </div>
         <p className="text-[#2E4A6B] text-xs mt-8">

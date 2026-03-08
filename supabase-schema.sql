@@ -30,7 +30,8 @@ create policy "Service role insert"
 insert into public.merchant_listings (merchant_id, product_name, description) values
   ('backpack', 'City Pack 28L', 'Northbound Packs City Pack 28L — handmade canvas hiking backpack. Durable YKK zippers. Padded laptop sleeve. Multiple colors. Ships Canada. $179.'),
   ('streetwear', 'OG Heavyweight Tee', 'StreetRoot Co OG Heavyweight Tee — 400gsm cotton. Drop shoulder fit. Screen printed in Montreal. Sizes XS-3XL. $65.'),
-  ('electronics', 'NorthCharge 20K', 'NorthTech Goods NorthCharge 20K — 20000mAh power bank. GaN charging. Dual USB-C. Made in BC. TSA approved. $89.')
+  ('electronics', 'NorthCharge 20K', 'NorthTech Goods NorthCharge 20K — 20000mAh power bank. GaN charging. Dual USB-C. Made in BC. TSA approved. $89.'),
+  ('shawarma', 'Classic Shawarma Plate', 'Shawarma Palace Classic Shawarma Plate — tender beef or chicken, fresh veggies, rice, and house garlic sauce. Halal. Made in Ontario. $14.')
 on conflict (merchant_id) do update set
   product_name = excluded.product_name,
   description = excluded.description,

@@ -26,9 +26,14 @@ const FALLBACK_COLORS: Record<string, string> = {
   Mophie: "#1E6FD4",
   Samsung: "#D4930A",
   REI: "#D4930A",
-  MEC: "#8B5CF6",
+  MEC: "#2E4A6B",
   Carhartt: "#D4930A",
-  "Nike SB": "#8B5CF6",
+  "Nike SB": "#2E4A6B",
+  "McDonald's": "#C8102E",
+  Subway: "#0EA472",
+  "Tim Hortons": "#1E6FD4",
+  "Pita Pit": "#D4930A",
+  Others: "#2E4A6B",
 };
 
 export function StolenCustomersChart() {
