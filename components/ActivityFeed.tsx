@@ -107,25 +107,25 @@ export function ActivityFeed({
 
   const actionClass = (action: Row["action"]) => {
     if (action === "Purchased") return "text-[var(--brand-red)]";
-    if (action === "Clicked") return "text-[var(--brand-blue-light)]";
-    return "text-[#888]";
+    if (action === "Clicked") return "text-[var(--brand-blue)]";
+    return "text-white";
   };
 
   return (
     <div className="rounded-xl border border-[var(--border)] bg-[var(--surface)] p-6 transition-shadow duration-150 hover:shadow-[0_0_0_1px_rgba(255,255,255,0.12)]">
       <div className="flex items-center gap-2 mb-4">
-        <h2 className="text-lg font-semibold text-[var(--text-primary)]">
+        <h2 className="text-lg font-semibold text-white">
           Recent Clip Activity
         </h2>
         <span className="live-dot" aria-hidden />
       </div>
-      <p className="text-sm text-[var(--text-secondary)] mb-4 font-mono">
+      <p className="text-sm text-white/90 mb-4 font-mono">
         Live feed from App Clip interactions
       </p>
       <div className="overflow-x-auto">
         <table className="w-full text-sm">
           <thead>
-            <tr className="text-left text-[var(--text-secondary)] border-b border-[var(--border)] font-mono uppercase text-xs">
+            <tr className="text-left text-white/90 border-b border-[var(--border)] font-mono uppercase text-xs">
               <th className="pb-3 font-medium">Time</th>
               <th className="pb-3 font-medium">Query</th>
               <th className="pb-3 font-medium">Intercepted</th>
@@ -142,19 +142,19 @@ export function ActivityFeed({
                   i === 0 ? "animate-[fadeIn_0.3s_ease-out_forwards]" : ""
                 }`}
               >
-                <td className="py-3 text-[var(--text-secondary)] tabular-tight">
+                <td className="py-3 text-white tabular-tight">
                   {row.time}
                 </td>
-                <td className="py-3 font-mono text-[var(--brand-blue-light)] text-xs">
+                <td className="py-3 font-mono text-white text-xs">
                   &quot;{row.query}&quot;
                 </td>
-                <td className="py-3 text-[var(--text-secondary)]">
+                <td className="py-3 text-white">
                   {row.intercepted}
                 </td>
-                <td className={`py-3 font-mono ${actionClass(row.action)}`}>
+                <td className={`py-3 font-mono font-medium ${actionClass(row.action)}`}>
                   {row.action}
                 </td>
-                <td className="py-3 text-[var(--text-secondary)] font-mono tabular-tight">
+                <td className="py-3 text-white font-mono tabular-tight">
                   {row.province}
                 </td>
               </tr>

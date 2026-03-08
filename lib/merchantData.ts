@@ -281,10 +281,38 @@ export const merchantData: Record<MerchantId, MerchantData> = {
         topProvinces: [{ province: "QC", pct: 42 }, { province: "ON", pct: 35 }, { province: "BC", pct: 15 }, { province: "NB", pct: 8 }],
       },
     },
-    viewsTimeSeries: Array.from({ length: 30 }, (_, i) => ({ date: `Day ${i + 1}`, value: 40 + i * 3 + Math.sin(i * 0.3) * 5 })),
-    tapsTimeSeries: Array.from({ length: 30 }, (_, i) => ({ date: `Day ${i + 1}`, value: 10 + (i % 5) * 4 + (i % 3) * 3 })),
-    purchasesTimeSeries: Array.from({ length: 30 }, (_, i) => ({ date: `Day ${i + 1}`, value: (i % 7 >= 5 ? 12 : 6) + (i % 4) })),
-    revenueTimeSeries: Array.from({ length: 30 }, (_, i) => ({ date: `Day ${i + 1}`, value: ((i % 7 >= 5 ? 12 : 6) + (i % 4)) * 18 })),
+    viewsTimeSeries: (() => {
+      const out: StatTimeSeries = [];
+      for (let i = 29; i >= 0; i--) {
+        const d = new Date(); d.setDate(d.getDate() - i);
+        out.push({ date: d.toLocaleDateString("en-CA", { month: "short", day: "numeric" }), value: 48 + i * 2 + Math.round(Math.sin(i * 0.4) * 8) });
+      }
+      return out;
+    })(),
+    tapsTimeSeries: (() => {
+      const out: StatTimeSeries = [];
+      for (let i = 29; i >= 0; i--) {
+        const d = new Date(); d.setDate(d.getDate() - i);
+        out.push({ date: d.toLocaleDateString("en-CA", { month: "short", day: "numeric" }), value: 8 + (i % 6) * 5 + (i % 4) * 2 });
+      }
+      return out;
+    })(),
+    purchasesTimeSeries: (() => {
+      const out: StatTimeSeries = [];
+      for (let i = 29; i >= 0; i--) {
+        const d = new Date(); d.setDate(d.getDate() - i);
+        out.push({ date: d.toLocaleDateString("en-CA", { month: "short", day: "numeric" }), value: (i % 7 >= 5 ? 14 : 5) + (i % 5) });
+      }
+      return out;
+    })(),
+    revenueTimeSeries: (() => {
+      const out: StatTimeSeries = [];
+      for (let i = 29; i >= 0; i--) {
+        const d = new Date(); d.setDate(d.getDate() - i);
+        out.push({ date: d.toLocaleDateString("en-CA", { month: "short", day: "numeric" }), value: ((i % 7 >= 5 ? 14 : 5) + (i % 5)) * 22 });
+      }
+      return out;
+    })(),
   },
   streetwear: {
     business: "StreetRoot Co",
@@ -396,6 +424,22 @@ export const merchantData: Record<MerchantId, MerchantData> = {
     funnelData: [
       { stage: "Viewed", count: 2341 }, { stage: "Clicked", count: 190 }, { stage: "Purchased", count: 189 },
     ],
+    viewsTimeSeries: (() => {
+      const out: StatTimeSeries = [];
+      for (let i = 29; i >= 0; i--) {
+        const d = new Date(); d.setDate(d.getDate() - i);
+        out.push({ date: d.toLocaleDateString("en-CA", { month: "short", day: "numeric" }), value: 62 + i * 1.8 + (i % 4) * 6 });
+      }
+      return out;
+    })(),
+    tapsTimeSeries: (() => {
+      const out: StatTimeSeries = [];
+      for (let i = 29; i >= 0; i--) {
+        const d = new Date(); d.setDate(d.getDate() - i);
+        out.push({ date: d.toLocaleDateString("en-CA", { month: "short", day: "numeric" }), value: 12 + (i % 7) * 3 + (i % 2) * 5 });
+      }
+      return out;
+    })(),
   },
   electronics: {
     business: "NorthTech Goods",
@@ -507,6 +551,22 @@ export const merchantData: Record<MerchantId, MerchantData> = {
     funnelData: [
       { stage: "Viewed", count: 4102 }, { stage: "Clicked", count: 512 }, { stage: "Purchased", count: 312 },
     ],
+    viewsTimeSeries: (() => {
+      const out: StatTimeSeries = [];
+      for (let i = 29; i >= 0; i--) {
+        const d = new Date(); d.setDate(d.getDate() - i);
+        out.push({ date: d.toLocaleDateString("en-CA", { month: "short", day: "numeric" }), value: 118 + i * 4 + (i % 5) * 8 });
+      }
+      return out;
+    })(),
+    tapsTimeSeries: (() => {
+      const out: StatTimeSeries = [];
+      for (let i = 29; i >= 0; i--) {
+        const d = new Date(); d.setDate(d.getDate() - i);
+        out.push({ date: d.toLocaleDateString("en-CA", { month: "short", day: "numeric" }), value: 18 + (i % 6) * 6 + Math.floor(i / 4) });
+      }
+      return out;
+    })(),
   },
   shawarma: {
     business: "Shawarma Palace",
@@ -616,6 +676,22 @@ export const merchantData: Record<MerchantId, MerchantData> = {
     funnelData: [
       { stage: "Viewed", count: 982 }, { stage: "Clicked", count: 312 }, { stage: "Purchased", count: 156 },
     ],
+    viewsTimeSeries: (() => {
+      const out: StatTimeSeries = [];
+      for (let i = 29; i >= 0; i--) {
+        const d = new Date(); d.setDate(d.getDate() - i);
+        out.push({ date: d.toLocaleDateString("en-CA", { month: "short", day: "numeric" }), value: 26 + Math.floor(i / 3) * 2 + (i % 4) * 3 });
+      }
+      return out;
+    })(),
+    tapsTimeSeries: (() => {
+      const out: StatTimeSeries = [];
+      for (let i = 29; i >= 0; i--) {
+        const d = new Date(); d.setDate(d.getDate() - i);
+        out.push({ date: d.toLocaleDateString("en-CA", { month: "short", day: "numeric" }), value: 4 + (i % 3) * 4 + (i % 5) });
+      }
+      return out;
+    })(),
   },
 };
 

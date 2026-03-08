@@ -75,7 +75,7 @@ export function GeoScoreGauge({
             {displayCurrent}
           </span>
         </div>
-        <p className="mt-2 text-xs font-mono uppercase text-[#aaaaaa]">
+        <p className="mt-2 text-xs font-mono uppercase text-white/80">
           Current GEO Score
         </p>
       </div>
@@ -108,7 +108,7 @@ export function GeoScoreGauge({
               {displayProjected}
             </span>
           </div>
-          <p className="mt-2 text-xs font-mono uppercase text-[#aaaaaa]">
+          <p className="mt-2 text-xs font-mono uppercase text-white/80">
             Projected
           </p>
         </div>

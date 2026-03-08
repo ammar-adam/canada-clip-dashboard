@@ -4,6 +4,8 @@ import { useEffect, useCallback, useState } from "react";
 import {
   LineChart,
   Line,
+  AreaChart,
+  Area,
   BarChart,
   Bar,
   XAxis,
@@ -99,13 +101,13 @@ export function DetailPanel({
         aria-label={title}
       >
         <div className="p-7 flex items-center justify-between border-b border-[var(--border)]">
-          <h2 className="text-lg font-semibold text-[#fafafa]">
+          <h2 className="text-lg font-semibold text-white">
             {title}
           </h2>
           <button
             type="button"
             onClick={onClose}
-            className="p-2 rounded-lg text-[#888] hover:text-[#fafafa] hover:bg-white/5 transition-colors duration-150 focus:outline-none"
+            className="p-2 rounded-lg text-white/80 hover:text-white hover:bg-white/5 transition-colors duration-150 focus:outline-none"
             aria-label="Close panel"
           >
             <span className="text-xl leading-none">×</span>
@@ -115,21 +117,21 @@ export function DetailPanel({
           {payload?.type === "stat" && payload.key === "revenue" && (
             <>
               <section>
-                <h3 className="text-xs font-semibold uppercase tracking-widest text-[#aaaaaa] mb-2">
+                <h3 className="text-xs font-semibold uppercase tracking-widest text-white/80 mb-2">
                   Revenue over time
                 </h3>
                 <div className="flex gap-2 mb-3">
                   <button
                     type="button"
                     onClick={() => setRevenueGranularity("daily")}
-                    className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-colors ${revenueGranularity === "daily" ? "bg-white/15 text-white" : "text-[#888] hover:text-[#aaa]"}`}
+                    className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-colors ${revenueGranularity === "daily" ? "bg-white/15 text-white" : "text-white/70 hover:text-white"}`}
                   >
                     Daily
                   </button>
                   <button
                     type="button"
                     onClick={() => setRevenueGranularity("weekly")}
-                    className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-colors ${revenueGranularity === "weekly" ? "bg-white/15 text-white" : "text-[#888] hover:text-[#aaa]"}`}
+                    className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-colors ${revenueGranularity === "weekly" ? "bg-white/15 text-white" : "text-white/70 hover:text-white"}`}
                   >
                     Weekly
                   </button>
@@ -138,23 +140,23 @@ export function DetailPanel({
                   <ResponsiveContainer width="100%" height="100%">
                     <LineChart data={revenueData} margin={{ top: 8, right: 8, left: 0, bottom: 0 }}>
                       <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.06)" vertical={false} />
-                      <XAxis dataKey="period" tick={{ fill: "#888", fontSize: 10 }} axisLine={{ stroke: "var(--border)" }} tickLine={false} />
-                      <YAxis tick={{ fill: "#888", fontSize: 10 }} axisLine={false} tickLine={false} tickFormatter={(v) => `$${v}`} />
-                      <Tooltip contentStyle={{ backgroundColor: "#1a1a1a", border: "1px solid var(--border)", borderRadius: "8px" }} labelStyle={{ color: "#fafafa" }} formatter={(v: number) => [`$${v}`, "Revenue"]} />
-                      <Line type="monotone" dataKey="revenue" stroke="#fafafa" strokeWidth={2} dot={{ fill: "#1a1a1a", stroke: "#fafafa" }} />
+                      <XAxis dataKey="period" tick={{ fill: "rgba(255,255,255,0.8)", fontSize: 10 }} axisLine={{ stroke: "var(--border)" }} tickLine={false} />
+                      <YAxis tick={{ fill: "rgba(255,255,255,0.8)", fontSize: 10 }} axisLine={false} tickLine={false} tickFormatter={(v) => `$${v}`} />
+                      <Tooltip contentStyle={{ backgroundColor: "#1a1a1a", border: "1px solid var(--border)", borderRadius: "8px" }} labelStyle={{ color: "#fff" }} formatter={(v: number) => [`$${v}`, "Revenue"]} />
+                      <Line type="monotone" dataKey="revenue" stroke="#fff" strokeWidth={2} dot={{ fill: "#1a1a1a", stroke: "#fff" }} />
                     </LineChart>
                   </ResponsiveContainer>
                 </div>
               </section>
               <section>
-                <h3 className="text-xs font-semibold uppercase tracking-widest text-[#aaaaaa] mb-2">
+                <h3 className="text-xs font-semibold uppercase tracking-widest text-white/80 mb-2">
                   Top 3 source brands
                 </h3>
                 <div className="h-[140px]">
                   <ResponsiveContainer width="100%" height="100%">
                     <BarChart data={data.revenueByBrand} layout="vertical" margin={{ top: 0, right: 8, left: 0, bottom: 0 }}>
-                      <XAxis type="number" tick={{ fill: "#888", fontSize: 10 }} axisLine={{ stroke: "var(--border)" }} tickLine={false} tickFormatter={(v) => `$${v}`} />
-                      <YAxis type="category" dataKey="name" tick={{ fill: "#aaa", fontSize: 11 }} axisLine={false} tickLine={false} width={72} />
+                      <XAxis type="number" tick={{ fill: "rgba(255,255,255,0.8)", fontSize: 10 }} axisLine={{ stroke: "var(--border)" }} tickLine={false} tickFormatter={(v) => `$${v}`} />
+                      <YAxis type="category" dataKey="name" tick={{ fill: "rgba(255,255,255,0.9)", fontSize: 11 }} axisLine={false} tickLine={false} width={72} />
                       <Tooltip contentStyle={{ backgroundColor: "#1a1a1a", border: "1px solid var(--border)", borderRadius: "8px" }} formatter={(v: number) => [`$${v}`, "Revenue"]} />
                       <Bar dataKey="revenue" fill="var(--brand-red)" radius={[0, 4, 4, 0]} />
                     </BarChart>
@@ -162,17 +164,25 @@ export function DetailPanel({
                 </div>
               </section>
               <section>
-                <h3 className="text-xs font-semibold uppercase tracking-widest text-[#aaaaaa] mb-2">
+                <h3 className="text-xs font-semibold uppercase tracking-widest text-white/80 mb-2">
                   Province breakdown
                 </h3>
                 <div className="space-y-2">
                   {data.revenueByProvince.map((row, i) => (
                     <div key={row.province} className="flex items-center justify-between text-sm">
-                      <span className="text-[#aaa] font-mono">{row.province}</span>
-                      <span className="text-[#fafafa] tabular-nums">${row.revenue.toLocaleString()}</span>
+                      <span className="text-white font-mono">{row.province}</span>
+                      <span className="text-white tabular-nums">${row.revenue.toLocaleString()}</span>
                     </div>
                   ))}
                 </div>
+              </section>
+              <section>
+                <h3 className="text-xs font-semibold uppercase tracking-widest text-white/80 mb-2">
+                  Summary
+                </h3>
+                <p className="text-sm text-white font-mono">
+                  Profit margin 24% · AOV $94 · +12% vs last week
+                </p>
               </section>
             </>
           )}
@@ -180,14 +190,14 @@ export function DetailPanel({
           {payload?.type === "stat" && payload.key === "stolen" && (
             <>
               <section>
-                <h3 className="text-xs font-semibold uppercase tracking-widest text-[#aaaaaa] mb-2">
+                <h3 className="text-xs font-semibold uppercase tracking-widest text-white/80 mb-2">
                   Customers stolen by brand
                 </h3>
                 <div className="h-[220px]">
                   <ResponsiveContainer width="100%" height="100%">
                     <BarChart data={data.competitors} layout="vertical" margin={{ top: 0, right: 8, left: 0, bottom: 0 }}>
-                      <XAxis type="number" tick={{ fill: "#888", fontSize: 10 }} axisLine={{ stroke: "var(--border)" }} tickLine={false} />
-                      <YAxis type="category" dataKey="name" tick={{ fill: "#aaa", fontSize: 11 }} axisLine={false} tickLine={false} width={80} />
+                      <XAxis type="number" tick={{ fill: "rgba(255,255,255,0.8)", fontSize: 10 }} axisLine={{ stroke: "var(--border)" }} tickLine={false} />
+                      <YAxis type="category" dataKey="name" tick={{ fill: "rgba(255,255,255,0.9)", fontSize: 11 }} axisLine={false} tickLine={false} width={80} />
                       <Tooltip contentStyle={{ backgroundColor: "#1a1a1a", border: "1px solid var(--border)", borderRadius: "8px" }} />
                       <Bar dataKey="count" name="Stolen" radius={[0, 4, 4, 0]}>
                         {data.competitors.map((entry, i) => (
@@ -198,26 +208,42 @@ export function DetailPanel({
                   </ResponsiveContainer>
                 </div>
               </section>
+              <section>
+                <h3 className="text-xs font-semibold uppercase tracking-widest text-white/80 mb-2">
+                  Trend & top query
+                </h3>
+                <p className="text-sm text-white font-mono">
+                  +8% WoW · Top query: backpack under $200
+                </p>
+              </section>
             </>
           )}
 
           {payload?.type === "stat" && payload.key === "taps" && (
             <>
               <section>
-                <h3 className="text-xs font-semibold uppercase tracking-widest text-[#aaaaaa] mb-2">
+                <h3 className="text-xs font-semibold uppercase tracking-widest text-white/80 mb-2">
                   Taps over time (30 days)
                 </h3>
                 <div className="h-[220px]">
                   <ResponsiveContainer width="100%" height="100%">
                     <LineChart data={data.tapsTimeSeries ?? data.viewsOverTime.map((d) => ({ date: d.date, value: Math.round(d.views * 0.25) }))} margin={{ top: 8, right: 8, left: 0, bottom: 0 }}>
                       <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.06)" vertical={false} />
-                      <XAxis dataKey="date" tick={{ fill: "#888", fontSize: 9 }} axisLine={{ stroke: "var(--border)" }} tickLine={false} />
-                      <YAxis tick={{ fill: "#888", fontSize: 10 }} axisLine={false} tickLine={false} />
-                      <Tooltip contentStyle={{ backgroundColor: "#1a1a1a", border: "1px solid var(--border)", borderRadius: "8px" }} labelStyle={{ color: "#fafafa" }} />
-                      <Line type="monotone" dataKey="value" stroke="var(--brand-blue-light)" strokeWidth={2} dot={false} />
+                      <XAxis dataKey="date" tick={{ fill: "rgba(255,255,255,0.8)", fontSize: 9 }} axisLine={{ stroke: "var(--border)" }} tickLine={false} />
+                      <YAxis tick={{ fill: "rgba(255,255,255,0.8)", fontSize: 10 }} axisLine={false} tickLine={false} />
+                      <Tooltip contentStyle={{ backgroundColor: "#1a1a1a", border: "1px solid var(--border)", borderRadius: "8px" }} labelStyle={{ color: "#fff" }} />
+                      <Line type="monotone" dataKey="value" stroke="var(--brand-blue)" strokeWidth={2} strokeDasharray="6 4" dot={{ fill: "var(--brand-blue)", r: 2 }} />
                     </LineChart>
                   </ResponsiveContainer>
                 </div>
+              </section>
+              <section>
+                <h3 className="text-xs font-semibold uppercase tracking-widest text-white/80 mb-2">
+                  Tap-through by province
+                </h3>
+                <p className="text-sm text-white font-mono">
+                  ON 38% · BC 22% · AB 18% · QC 14% · Other 8%
+                </p>
               </section>
             </>
           )}
@@ -225,20 +251,34 @@ export function DetailPanel({
           {payload?.type === "stat" && payload.key === "views" && (
             <>
               <section>
-                <h3 className="text-xs font-semibold uppercase tracking-widest text-[#aaaaaa] mb-2">
+                <h3 className="text-xs font-semibold uppercase tracking-widest text-white/80 mb-2">
                   Clip views over time (30 days)
                 </h3>
                 <div className="h-[220px]">
                   <ResponsiveContainer width="100%" height="100%">
-                    <LineChart data={data.viewsTimeSeries ?? data.viewsOverTime.map((d) => ({ date: d.date, value: d.views }))} margin={{ top: 8, right: 8, left: 0, bottom: 0 }}>
+                    <AreaChart data={data.viewsTimeSeries ?? data.viewsOverTime.map((d) => ({ date: d.date, value: d.views }))} margin={{ top: 8, right: 8, left: 0, bottom: 0 }}>
+                      <defs>
+                        <linearGradient id="viewsFill" x1="0" y1="0" x2="0" y2="1">
+                          <stop offset="0%" stopColor="var(--brand-red)" stopOpacity={0.4} />
+                          <stop offset="100%" stopColor="var(--brand-red)" stopOpacity={0} />
+                        </linearGradient>
+                      </defs>
                       <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.06)" vertical={false} />
-                      <XAxis dataKey="date" tick={{ fill: "#888", fontSize: 9 }} axisLine={{ stroke: "var(--border)" }} tickLine={false} />
-                      <YAxis tick={{ fill: "#888", fontSize: 10 }} axisLine={false} tickLine={false} />
-                      <Tooltip contentStyle={{ backgroundColor: "#1a1a1a", border: "1px solid var(--border)", borderRadius: "8px" }} labelStyle={{ color: "#fafafa" }} />
-                      <Line type="monotone" dataKey="value" stroke="var(--brand-red)" strokeWidth={2} dot={false} />
-                    </LineChart>
+                      <XAxis dataKey="date" tick={{ fill: "rgba(255,255,255,0.8)", fontSize: 9 }} axisLine={{ stroke: "var(--border)" }} tickLine={false} />
+                      <YAxis tick={{ fill: "rgba(255,255,255,0.8)", fontSize: 10 }} axisLine={false} tickLine={false} />
+                      <Tooltip contentStyle={{ backgroundColor: "#1a1a1a", border: "1px solid var(--border)", borderRadius: "8px" }} labelStyle={{ color: "#fff" }} />
+                      <Area type="monotone" dataKey="value" stroke="var(--brand-red)" strokeWidth={2} fill="url(#viewsFill)" />
+                    </AreaChart>
                   </ResponsiveContainer>
                 </div>
+              </section>
+              <section>
+                <h3 className="text-xs font-semibold uppercase tracking-widest text-white/80 mb-2">
+                  Device split & peak
+                </h3>
+                <p className="text-sm text-white font-mono">
+                  Mobile 72% · Desktop 28%. Peak days: Sat–Sun.
+                </p>
               </section>
             </>
           )}
@@ -246,19 +286,27 @@ export function DetailPanel({
           {payload?.type === "stat" && (payload.key === "conversionRate" || payload.key === "purchases") && (
             <>
               <section>
-                <h3 className="text-xs font-semibold uppercase tracking-widest text-[#aaaaaa] mb-2">
+                <h3 className="text-xs font-semibold uppercase tracking-widest text-white/80 mb-2">
                   Conversion funnel
                 </h3>
                 <div className="h-[200px]">
                   <ResponsiveContainer width="100%" height="100%">
                     <BarChart data={data.funnelData} layout="vertical" margin={{ top: 0, right: 8, left: 0, bottom: 0 }}>
-                      <XAxis type="number" tick={{ fill: "#888", fontSize: 10 }} axisLine={{ stroke: "var(--border)" }} tickLine={false} />
-                      <YAxis type="category" dataKey="stage" tick={{ fill: "#aaa", fontSize: 11 }} axisLine={false} tickLine={false} width={72} />
+                      <XAxis type="number" tick={{ fill: "rgba(255,255,255,0.8)", fontSize: 10 }} axisLine={{ stroke: "var(--border)" }} tickLine={false} />
+                      <YAxis type="category" dataKey="stage" tick={{ fill: "rgba(255,255,255,0.9)", fontSize: 11 }} axisLine={false} tickLine={false} width={72} />
                       <Tooltip contentStyle={{ backgroundColor: "#1a1a1a", border: "1px solid var(--border)", borderRadius: "8px" }} />
                       <Bar dataKey="count" fill="var(--brand-blue)" radius={[0, 4, 4, 0]} />
                     </BarChart>
                   </ResponsiveContainer>
                 </div>
+              </section>
+              <section>
+                <h3 className="text-xs font-semibold uppercase tracking-widest text-white/80 mb-2">
+                  Drop-off
+                </h3>
+                <p className="text-sm text-white font-mono">
+                  75% view→tap · 54% tap→purchase
+                </p>
               </section>
             </>
           )}
@@ -266,28 +314,28 @@ export function DetailPanel({
           {payload?.type === "chart-bar" && (
             <>
               <section>
-                <h3 className="text-xs font-semibold uppercase tracking-widest text-[#aaaaaa] mb-2">
+                <h3 className="text-xs font-semibold uppercase tracking-widest text-white/80 mb-2">
                   Day breakdown
                 </h3>
-                <p className="text-sm text-[#888] font-mono">
+                <p className="text-sm text-white font-mono">
                   Full brand breakdown for {payload.day}
                 </p>
               </section>
               <div className="h-px bg-[var(--border)]" />
               <section>
-                <h3 className="text-xs font-semibold uppercase tracking-widest text-[#aaaaaa] mb-2">
+                <h3 className="text-xs font-semibold uppercase tracking-widest text-white/80 mb-2">
                   Hourly heatmap
                 </h3>
-                <p className="text-sm text-[#888] font-mono">
+                <p className="text-sm text-white font-mono">
                   Peak: 12–2pm and 7–9pm ET; weekend lift in afternoon
                 </p>
               </section>
               <div className="h-px bg-[var(--border)]" />
               <section>
-                <h3 className="text-xs font-semibold uppercase tracking-widest text-[#aaaaaa] mb-2">
+                <h3 className="text-xs font-semibold uppercase tracking-widest text-white/80 mb-2">
                   Top queries / conversion funnel
                 </h3>
-                <p className="text-sm text-[#888] font-mono">
+                <p className="text-sm text-white font-mono">
                   Viewed → Clicked → Purchased
                 </p>
               </section>
@@ -296,28 +344,28 @@ export function DetailPanel({
           {payload?.type === "brand" && (
             <>
               <section>
-                <h3 className="text-xs font-semibold uppercase tracking-widest text-[#aaaaaa] mb-2">
+                <h3 className="text-xs font-semibold uppercase tracking-widest text-white/80 mb-2">
                   Brand
                 </h3>
-                <p className="text-sm text-[#fafafa] font-mono">
+                <p className="text-sm text-white font-mono">
                   {payload.brandName}
                 </p>
               </section>
               <div className="h-px bg-[var(--border)]" />
               <section>
-                <h3 className="text-xs font-semibold uppercase tracking-widest text-[#aaaaaa] mb-2">
+                <h3 className="text-xs font-semibold uppercase tracking-widest text-white/80 mb-2">
                   Top 5 intercepted queries
                 </h3>
-                <p className="text-sm text-[#888] font-mono">
+                <p className="text-sm text-white font-mono">
                   backpack under $200 · Canadian made backpack · Jansport alternative
                 </p>
               </section>
               <div className="h-px bg-[var(--border)]" />
               <section>
-                <h3 className="text-xs font-semibold uppercase tracking-widest text-[#aaaaaa] mb-2">
+                <h3 className="text-xs font-semibold uppercase tracking-widest text-white/80 mb-2">
                   Province distribution / AOV / Trend
                 </h3>
-                <p className="text-sm text-[#888] font-mono">
+                <p className="text-sm text-white font-mono">
                   ON 38% · QC 22% · BC 20% · AOV $94 · +12% vs last week
                 </p>
               </section>
@@ -326,22 +374,22 @@ export function DetailPanel({
           {payload?.type === "table-row" && (
             <>
               <section>
-                <h3 className="text-xs font-semibold uppercase tracking-widest text-[#aaaaaa] mb-2">
+                <h3 className="text-xs font-semibold uppercase tracking-widest text-white/80 mb-2">
                   Session
                 </h3>
-                <p className="text-sm text-[#fafafa] font-mono">
+                <p className="text-sm text-white font-mono">
                   {payload.row.time} · {payload.row.query}
                 </p>
-                <p className="text-xs text-[#888] mt-1">
+                <p className="text-xs text-white/90 mt-1">
                   {payload.row.intercepted} · {payload.row.action} · {payload.row.province}
                 </p>
               </section>
               <div className="h-px bg-[var(--border)]" />
               <section>
-                <h3 className="text-xs font-semibold uppercase tracking-widest text-[#aaaaaa] mb-2">
+                <h3 className="text-xs font-semibold uppercase tracking-widest text-white/80 mb-2">
                   Device / Trigger URL / Journey
                 </h3>
-                <p className="text-sm text-[#888] font-mono">
+                <p className="text-sm text-white font-mono">
                   iPhone 15 · thenorthface.com/en-ca/shop/equipment/backpacks · {payload.row.journey ?? "Viewed → Clicked → Purchased"}
                 </p>
               </section>
@@ -354,47 +402,47 @@ export function DetailPanel({
             return (
               <>
                 <section>
-                  <h3 className="text-xs font-semibold uppercase tracking-widest text-[#aaaaaa] mb-2">
+                  <h3 className="text-xs font-semibold uppercase tracking-widest text-white/80 mb-2">
                     14-day impression sparkline
                   </h3>
                   <div className="h-[100px]">
                     <ResponsiveContainer width="100%" height="100%">
                       <LineChart data={drill.sparkline} margin={{ top: 8, right: 8, left: 0, bottom: 0 }}>
                         <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.06)" vertical={false} />
-                        <XAxis dataKey="day" tick={{ fill: "#888", fontSize: 9 }} axisLine={{ stroke: "var(--border)" }} tickLine={false} />
-                        <YAxis tick={{ fill: "#888", fontSize: 10 }} axisLine={false} tickLine={false} />
-                        <Line type="monotone" dataKey="impressions" stroke="var(--brand-blue-light)" strokeWidth={2} dot={false} />
+                        <XAxis dataKey="day" tick={{ fill: "rgba(255,255,255,0.8)", fontSize: 9 }} axisLine={{ stroke: "var(--border)" }} tickLine={false} />
+                        <YAxis tick={{ fill: "rgba(255,255,255,0.8)", fontSize: 10 }} axisLine={false} tickLine={false} />
+                        <Line type="monotone" dataKey="impressions" stroke="var(--brand-blue)" strokeWidth={2} dot={false} />
                       </LineChart>
                     </ResponsiveContainer>
                   </div>
                 </section>
                 <section>
-                  <h3 className="text-xs font-semibold uppercase tracking-widest text-[#aaaaaa] mb-2">
+                  <h3 className="text-xs font-semibold uppercase tracking-widest text-white/80 mb-2">
                     Conversion rate (Purchases / Views)
                   </h3>
-                  <p className="text-sm text-[#fafafa] font-mono tabular-nums">{conversionPct}%</p>
+                  <p className="text-sm text-white font-mono tabular-nums">{conversionPct}%</p>
                 </section>
                 <section>
-                  <h3 className="text-xs font-semibold uppercase tracking-widest text-[#aaaaaa] mb-2">
+                  <h3 className="text-xs font-semibold uppercase tracking-widest text-white/80 mb-2">
                     Top 3 provinces
                   </h3>
                   <div className="space-y-2">
                     {drill.topProvinces.map(({ province, pct }) => (
                       <div key={province} className="flex items-center gap-2">
-                        <span className="w-8 text-[#888] font-mono text-sm">{province}</span>
+                        <span className="w-8 text-white font-mono text-sm">{province}</span>
                         <div className="flex-1 h-2 rounded-full bg-white/10 overflow-hidden">
                           <div className="h-full rounded-full bg-[var(--brand-blue)]" style={{ width: `${pct}%` }} />
                         </div>
-                        <span className="text-[#888] font-mono text-xs tabular-nums w-8">{pct}%</span>
+                        <span className="text-white font-mono text-xs tabular-nums w-8">{pct}%</span>
                       </div>
                     ))}
                   </div>
                 </section>
                 <section>
-                  <h3 className="text-xs font-semibold uppercase tracking-widest text-[#aaaaaa] mb-2">
+                  <h3 className="text-xs font-semibold uppercase tracking-widest text-white/80 mb-2">
                     Top device type
                   </h3>
-                  <p className="text-sm text-[#888] font-mono">{drill.device}</p>
+                  <p className="text-sm text-white font-mono">{drill.device}</p>
                 </section>
                 <button
                   type="button"
@@ -412,37 +460,37 @@ export function DetailPanel({
             return (
               <>
                 <section>
-                  <h3 className="text-xs font-semibold uppercase tracking-widest text-[#aaaaaa] mb-2">
+                  <h3 className="text-xs font-semibold uppercase tracking-widest text-white/80 mb-2">
                     Impression history (14 days)
                   </h3>
                   <div className="h-[120px]">
                     <ResponsiveContainer width="100%" height="100%">
                       <LineChart data={drill.sparkline} margin={{ top: 8, right: 8, left: 0, bottom: 0 }}>
                         <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.06)" vertical={false} />
-                        <XAxis dataKey="day" tick={{ fill: "#888", fontSize: 9 }} axisLine={{ stroke: "var(--border)" }} tickLine={false} />
-                        <YAxis tick={{ fill: "#888", fontSize: 10 }} axisLine={false} tickLine={false} />
+                        <XAxis dataKey="day" tick={{ fill: "rgba(255,255,255,0.8)", fontSize: 9 }} axisLine={{ stroke: "var(--border)" }} tickLine={false} />
+                        <YAxis tick={{ fill: "rgba(255,255,255,0.8)", fontSize: 10 }} axisLine={false} tickLine={false} />
                         <Tooltip contentStyle={{ backgroundColor: "#1a1a1a", border: "1px solid var(--border)", borderRadius: "8px" }} />
-                        <Line type="monotone" dataKey="impressions" stroke="var(--brand-blue-light)" strokeWidth={2} dot={false} />
+                        <Line type="monotone" dataKey="impressions" stroke="var(--brand-blue)" strokeWidth={2} dot={false} />
                       </LineChart>
                     </ResponsiveContainer>
                   </div>
                 </section>
                 <section>
-                  <h3 className="text-xs font-semibold uppercase tracking-widest text-[#aaaaaa] mb-2">
+                  <h3 className="text-xs font-semibold uppercase tracking-widest text-white/80 mb-2">
                     Conversion rate (this query)
                   </h3>
-                  <p className="text-sm text-[#fafafa] font-mono tabular-nums">
+                  <p className="text-sm text-white font-mono tabular-nums">
                     ~{Math.round(8000 / Math.max(1, payload.impressions)) / 100}% (view → tap → purchase)
                   </p>
                 </section>
                 <section>
-                  <h3 className="text-xs font-semibold uppercase tracking-widest text-[#aaaaaa] mb-2">
+                  <h3 className="text-xs font-semibold uppercase tracking-widest text-white/80 mb-2">
                     Top provinces / devices
                   </h3>
-                  <p className="text-sm text-[#888] font-mono">
+                  <p className="text-sm text-white font-mono">
                     {drill.topProvinces.map((p) => `${p.province} ${p.pct}%`).join(" · ")}
                   </p>
-                  <p className="text-xs text-[#888] font-mono mt-1">
+                  <p className="text-xs text-white/90 font-mono mt-1">
                     iPhone 62% · Android 28% · Other 10%
                   </p>
                 </section>
@@ -450,7 +498,7 @@ export function DetailPanel({
                 <button
                   type="button"
                   onClick={() => payload.isPaused ? onPauseTrigger?.(payload.query) : onPauseTrigger?.(payload.query)}
-                  className="rounded-lg border border-[var(--border)] bg-white/5 px-4 py-2 text-sm font-medium text-[#fafafa] hover:bg-white/10 transition-colors"
+                  className="rounded-lg border border-[var(--border)] bg-white/5 px-4 py-2 text-sm font-medium text-white hover:bg-white/10 transition-colors"
                 >
                   {payload.isPaused ? "Resume trigger" : "Pause trigger"}
                 </button>
@@ -476,7 +524,7 @@ export function DetailPanel({
                     <button
                       type="button"
                       onClick={() => setBoostDurationSelecting(false)}
-                      className="rounded-lg border border-[var(--border)] px-3 py-2 text-sm text-[#888] hover:bg-white/5"
+                      className="rounded-lg border border-[var(--border)] px-3 py-2 text-sm text-white/80 hover:bg-white/5"
                     >
                       Cancel
                     </button>
@@ -498,28 +546,28 @@ export function DetailPanel({
           {payload?.type === "stat" && !["revenue", "stolen", "views", "conversionRate", "taps", "purchases"].includes(payload.key) && (
             <>
               <section>
-                <h3 className="text-xs font-semibold uppercase tracking-widest text-[#aaaaaa] mb-2">
+                <h3 className="text-xs font-semibold uppercase tracking-widest text-white/80 mb-2">
                   Sparkline trend (30 days)
                 </h3>
-                <p className="text-sm text-[#888] font-mono">
+                <p className="text-sm text-white font-mono">
                   Daily views and conversions for the last 30 days
                 </p>
               </section>
               <div className="h-px bg-[var(--border)]" />
               <section>
-                <h3 className="text-xs font-semibold uppercase tracking-widest text-[#aaaaaa] mb-2">
+                <h3 className="text-xs font-semibold uppercase tracking-widest text-white/80 mb-2">
                   Breakdown by province
                 </h3>
-                <p className="text-sm text-[#888] font-mono">
+                <p className="text-sm text-white font-mono">
                   ON 34% · BC 28% · AB 18% · QC 12% · Other 8%
                 </p>
               </section>
               <div className="h-px bg-[var(--border)]" />
               <section>
-                <h3 className="text-xs font-semibold uppercase tracking-widest text-[#aaaaaa] mb-2">
+                <h3 className="text-xs font-semibold uppercase tracking-widest text-white/80 mb-2">
                   Top 3 source brands
                 </h3>
-                <p className="text-sm text-[#888] font-mono">
+                <p className="text-sm text-white font-mono">
                   Jansport 41% · Herschel 28% · North Face 18% · Others 13%
                 </p>
               </section>
@@ -528,10 +576,10 @@ export function DetailPanel({
 
           <div className="h-px bg-[var(--border)]" />
           <section>
-            <h3 className="text-xs font-semibold uppercase tracking-widest text-[#888] mb-2">
+            <h3 className="text-xs font-semibold uppercase tracking-widest text-white/80 mb-2">
               Data source
             </h3>
-            <pre className="text-xs text-[#7a7a7a] font-mono bg-black/20 p-3 rounded-lg overflow-x-auto whitespace-pre">
+            <pre className="text-xs text-white/80 font-mono bg-black/20 p-3 rounded-lg overflow-x-auto whitespace-pre">
               {DATA_SOURCE_PLACEHOLDER}
             </pre>
           </section>

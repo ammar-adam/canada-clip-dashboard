@@ -1,4 +1,3 @@
-import { GoogleGenerativeAI } from "@google/generative-ai";
 import { NextResponse } from "next/server";
 import { createServerClient } from "@/lib/supabase";
 
@@ -37,9 +36,9 @@ Return ONLY valid JSON, no markdown, no code fence. Use this exact structure:
 Product listing to analyze:
 ${listing}`;
 
-const GEMINI_MODELS = ["gemini-2.0-flash", "gemini-1.5-flash", "gemini-1.5-pro"] as const;
+const DEEPSEEK_MODEL = "deepseek-chat";
 
-function parseGeminiResponse(text: string): {
+function parseGeoResponse(text: string): {
   suggestions: GeoSuggestion[];
   optimizedListing: string;
   geoScore: number;
@@ -69,13 +68,13 @@ function parseGeminiResponse(text: string): {
 }
 
 export async function POST(req: Request) {
-  const apiKey = process.env.GEMINI_API_KEY;
+  const apiKey = process.env.GEMINI_API_KEY?.trim();
   if (!apiKey) {
     return NextResponse.json(
       {
         error: "API key not configured",
         code: "GEMINI_API_KEY_NOT_SET",
-        message: "Add GEMINI_API_KEY to your .env.local to enable analysis. Get a key at https://aistudio.google.com/apikey",
+        message: "Add GEMINI_API_KEY to your .env.local to enable analysis.",
       },
       { status: 503 }
     );
@@ -103,28 +102,59 @@ export async function POST(req: Request) {
     );
   }
 
-  const genAI = new GoogleGenerativeAI(apiKey);
   let suggestions: GeoSuggestion[] = [];
   let optimizedListing = "";
   let geoScore = 34;
   let projectedScore = 78;
 
-  for (const modelId of GEMINI_MODELS) {
-    try {
-      const model = genAI.getGenerativeModel({ model: modelId });
-      const result = await model.generateContent(GEO_PROMPT(listing));
-      const text = result.response.text();
-      if (!text) continue;
-      const parsed = parseGeminiResponse(text);
-      if (parsed.suggestions.length === 0) continue;
+  try {
+    const res = await fetch("https://api.deepseek.com/v1/chat/completions", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${apiKey}`,
+      },
+      body: JSON.stringify({
+        model: DEEPSEEK_MODEL,
+        messages: [{ role: "user", content: GEO_PROMPT(listing) }],
+        response_format: { type: "json_object" },
+        max_tokens: 4096,
+      }),
+    });
+
+    if (!res.ok) {
+      const err = await res.json().catch(() => ({}));
+      const msg = typeof err.error?.message === "string" ? err.error.message : res.statusText;
+      return NextResponse.json(
+        { error: "Analysis failed", message: msg },
+        { status: res.status >= 500 ? 503 : res.status }
+      );
+    }
+
+    const data = await res.json();
+    const text = data.choices?.[0]?.message?.content;
+    if (!text) {
+      return NextResponse.json(
+        { error: "Empty response from model" },
+        { status: 502 }
+      );
+    }
+
+    const parsed = parseGeoResponse(text);
+    if (parsed.suggestions.length > 0) {
       suggestions = parsed.suggestions;
       optimizedListing = parsed.optimizedListing;
       geoScore = parsed.geoScore;
       projectedScore = parsed.projectedScore;
-      break;
-    } catch (e) {
-      console.warn(`GEO API: model ${modelId} failed`, e);
-      continue;
+    }
+  } catch (e) {
+    const err = e instanceof Error ? e : new Error(String(e));
+    console.warn("GEO API: DeepSeek request failed", err.message);
+    if (apiKey.length < 20) {
+      return NextResponse.json(
+        { error: "Invalid API key", message: "Key may be truncated or invalid." },
+        { status: 503 }
+      );
     }
   }
 

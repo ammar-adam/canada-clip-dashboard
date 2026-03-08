@@ -35,7 +35,7 @@ export function ActiveTriggers({
             </span>
             <div className="flex items-center gap-2 flex-wrap">
               {pausedQueries.has(t.query) && (
-                <span className="rounded-full bg-[#555] text-[#aaa] text-xs font-mono px-2 py-0.5">
+                <span className="rounded-full bg-white/20 text-white text-xs font-mono px-2 py-0.5">
                   Paused
                 </span>
               )}
@@ -53,7 +53,7 @@ export function ActiveTriggers({
       </ul>
       <button
         type="button"
-        className="mt-4 w-full rounded-xl border border-dashed border-[var(--border)] bg-transparent py-3 text-sm font-medium text-[var(--text-secondary)] hover:border-[#888] hover:text-[var(--text-primary)] transition-colors duration-150 cursor-pointer"
+        className="mt-4 w-full rounded-xl border border-dashed border-[var(--border)] bg-transparent py-3 text-sm font-medium text-[var(--text-secondary)] hover:border-white/40 hover:text-[var(--text-primary)] transition-colors duration-150 cursor-pointer"
       >
         + Add trigger
       </button>

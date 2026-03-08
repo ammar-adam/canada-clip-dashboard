@@ -56,11 +56,6 @@ export default function GeoPage() {
     setListing(data.productDescriptions[product] ?? "");
   };
 
-  function openRewritePanel() {
-    setSuggestedRewrite(optimizedListing);
-    setShowRewritePanel(true);
-    setRewriteAccepted(false);
-  }
 
   async function handleTryAgainRewrite() {
     setRewriteLoading(true);
@@ -185,22 +180,22 @@ export default function GeoPage() {
   return (
     <div className="space-y-8">
       <div>
-        <h1 className="text-2xl font-semibold text-[var(--text-primary)]">
+        <h1 className="text-2xl font-semibold text-white">
           GEO Optimizer
         </h1>
-        <p className="text-[var(--text-secondary)] mt-1 text-sm font-mono">
+        <p className="text-white/90 mt-1 text-sm font-mono">
           Improve your discoverability in LLM search results with Gemini AI.
         </p>
       </div>
 
       <div className="rounded-xl border border-[var(--border)] bg-[var(--surface)] p-6 transition-shadow duration-150 hover:shadow-[0_0_0_1px_rgba(255,255,255,0.12)]">
-        <label className="block text-xs font-semibold uppercase tracking-widest text-[#aaaaaa] mb-2">
+        <label className="block text-xs font-semibold uppercase tracking-widest text-white/90 mb-2">
           Select a product to optimize
         </label>
         <select
           value={selectedProduct}
           onChange={handleProductChange}
-          className="w-full max-w-md rounded-lg border border-[var(--border)] bg-[var(--surface)] text-[var(--text-primary)] px-4 py-2.5 text-sm font-mono focus:border-[var(--accent)] focus:ring-0 focus:outline-none transition-colors duration-150"
+          className="w-full max-w-md rounded-lg border border-[var(--border)] bg-[var(--surface)] text-white px-4 py-2.5 text-sm font-mono focus:border-[var(--brand-red)] focus:ring-0 focus:outline-none transition-colors duration-150"
         >
           {data.products.map((p) => (
             <option key={p} value={p}>
@@ -225,20 +220,20 @@ export default function GeoPage() {
       />
 
       <div className="rounded-xl border border-[var(--border)] bg-[var(--surface)] p-6 transition-shadow duration-150 hover:shadow-[0_0_0_1px_rgba(255,255,255,0.12)]">
-        <h2 className="text-base font-semibold text-[#fafafa] mb-3">
+        <h2 className="text-base font-semibold text-white mb-3">
           Current listing
         </h2>
         <textarea
           value={listing}
           onChange={(e) => setListing(e.target.value)}
           rows={5}
-          className="w-full rounded-xl border border-[var(--border)] bg-[var(--surface)] text-[var(--text-primary)] p-4 text-sm font-mono min-h-32 focus:border-[var(--accent)] focus:ring-0 focus:outline-none transition-colors duration-150 placeholder:text-[var(--text-secondary)]"
+          className="w-full rounded-xl border border-[var(--border)] bg-[var(--surface)] text-white p-4 text-sm font-mono min-h-32 focus:border-[var(--brand-red)] focus:ring-0 focus:outline-none transition-colors duration-150 placeholder:text-white/50"
           placeholder="Paste your product or listing text here for GEO suggestions (e.g. title, description, bullet points)"
         />
         <button
           onClick={handleAnalyze}
           disabled={loading}
-          className="mt-4 inline-flex items-center gap-2 rounded-lg bg-[var(--accent)] text-[var(--bg)] font-semibold px-4 py-2 border border-[var(--border)] disabled:opacity-50 disabled:cursor-not-allowed transition-colors duration-150 hover:shadow-[0_0_0_1px_rgba(255,255,255,0.12)]"
+          className="mt-4 inline-flex items-center gap-2 rounded-lg bg-[var(--brand-red)] text-white font-semibold px-4 py-2 border border-[var(--border)] disabled:opacity-50 disabled:cursor-not-allowed transition-colors duration-150 hover:opacity-90"
         >
           <Sparkles className="w-4 h-4" />
           {loading ? "Analyzing…" : "Analyze with Gemini AI"}
@@ -248,7 +243,7 @@ export default function GeoPage() {
             Gemini is analyzing…
           </p>
         )}
-        <p className="mt-2 text-xs text-[var(--text-secondary)] font-mono">
+        <p className="mt-2 text-xs text-white/80 font-mono">
           Runs Gemini and saves suggestions + optimized listing to Supabase.
         </p>
         {error && (
@@ -256,7 +251,7 @@ export default function GeoPage() {
             <p className="text-sm font-semibold text-[var(--accent)] mb-1">
               {error.includes("API key") || error.includes("GEMINI_API_KEY") ? "API key not working" : "Error"}
             </p>
-            <p className="text-sm text-[var(--text-secondary)] font-mono">
+            <p className="text-sm text-white font-mono">
               {error}
             </p>
           </div>
@@ -266,7 +261,7 @@ export default function GeoPage() {
       {analysisDone && (
         <>
           <div className="rounded-xl border border-[var(--border)] bg-[var(--surface)] p-6 transition-shadow duration-150 hover:shadow-[0_0_0_1px_rgba(255,255,255,0.12)]">
-            <h2 className="text-base font-semibold text-[#fafafa] mb-4">
+            <h2 className="text-base font-semibold text-white mb-4">
               GEO Score
             </h2>
             <GeoScoreGauge
@@ -278,34 +273,62 @@ export default function GeoPage() {
           </div>
 
           <div className="rounded-xl border border-[var(--border)] bg-[var(--surface)] p-6 transition-shadow duration-150 hover:shadow-[0_0_0_1px_rgba(255,255,255,0.12)]">
-            <h2 className="text-base font-semibold text-[#fafafa] mb-4">
+            <h2 className="text-base font-semibold text-white mb-4">
               Suggestions
             </h2>
             <GeoSuggestionsPanel suggestions={suggestions} loaded={analysisDone} />
           </div>
 
-          {optimizedListing && (
-            <div className="rounded-xl border border-[var(--border)] bg-[var(--surface)] p-6 transition-shadow duration-150 hover:shadow-[0_0_0_1px_rgba(255,255,255,0.12)]">
-              <button
-                type="button"
-                onClick={openRewritePanel}
-                className="inline-flex items-center gap-2 rounded-lg bg-[var(--accent)] text-[var(--bg)] font-semibold px-4 py-2.5 border border-[var(--border)] transition-colors duration-150 hover:shadow-[0_0_0_1px_rgba(255,255,255,0.12)]"
-              >
-                <Sparkles className="w-4 h-4" />
-                Rewrite with Gemini
-              </button>
-            </div>
-          )}
+          <div className="rounded-xl border border-[var(--border)] bg-[var(--surface)] p-6 transition-shadow duration-150 hover:shadow-[0_0_0_1px_rgba(255,255,255,0.12)]">
+            <button
+              type="button"
+              onClick={async () => {
+                if (!optimizedListing && suggestions.length > 0) {
+                  setRewriteLoading(true);
+                  try {
+                    const res = await fetch("/api/geo/rewrite", {
+                      method: "POST",
+                      headers: { "Content-Type": "application/json" },
+                      body: JSON.stringify({ listing, issues: suggestions.map((s) => s.issue) }),
+                    });
+                    const result = await res.json();
+                    if (res.ok && typeof result.optimizedListing === "string") {
+                      setSuggestedRewrite(result.optimizedListing.trim());
+                      setOptimizedListing(result.optimizedListing.trim());
+                    } else {
+                      setSuggestedRewrite(listing + "\n\n[Add price and Canadian signal here.]");
+                    }
+                  } catch {
+                    setSuggestedRewrite(listing + "\n\n[Add price and Canadian signal here.]");
+                  } finally {
+                    setRewriteLoading(false);
+                  }
+                } else {
+                  setSuggestedRewrite(optimizedListing || listing);
+                }
+                setShowRewritePanel(true);
+                setRewriteAccepted(false);
+              }}
+              disabled={rewriteLoading}
+              className="inline-flex items-center gap-2 rounded-lg bg-[var(--brand-red)] text-white font-semibold px-4 py-2.5 border border-[var(--border)] transition-colors duration-150 hover:opacity-90 disabled:opacity-50"
+            >
+              <Sparkles className="w-4 h-4" />
+              {rewriteLoading ? "Gemini is rewriting…" : "Rewrite with Gemini"}
+            </button>
+            <p className="mt-2 text-xs text-white/80 font-mono">
+              Get an optimized description and save to Supabase.
+            </p>
+          </div>
 
           {showRewritePanel && suggestedRewrite && (
             <div className="rounded-xl border border-[var(--border)] bg-[var(--surface)] p-6 transition-shadow duration-150 hover:shadow-[0_0_0_1px_rgba(255,255,255,0.12)]">
-              <h2 className="text-base font-semibold text-[#fafafa] mb-2">
+              <h2 className="text-base font-semibold text-white mb-2">
                 Suggested Rewrite
               </h2>
-              <p className="text-xs text-[#aaaaaa] font-mono mb-3">
+              <p className="text-xs text-white/90 font-mono mb-3">
                 Projected GEO score: +{projectedScore}
               </p>
-              <div className="rounded-lg border border-[var(--border)] bg-black/20 p-4 text-sm text-[var(--text-primary)] leading-relaxed font-mono mb-4 min-h-[100px]">
+              <div className="rounded-lg border border-[var(--border)] bg-black/20 p-4 text-sm text-white leading-relaxed font-mono mb-4 min-h-[100px]">
                 {suggestedRewrite}
               </div>
               {!rewriteAccepted ? (
