@@ -1,3 +1,4 @@
+import Image from "next/image";
 import { auth0 } from "@/lib/auth0";
 import { redirect } from "next/navigation";
 
@@ -8,9 +9,12 @@ export default async function LoginPage() {
   return (
     <div className="min-h-screen bg-[#050C1A] flex flex-col items-center justify-center px-6">
       <div className="flex flex-col items-center text-center">
-        <h1 className="text-[#E8EDF5] text-3xl font-bold">
-          🍁 CanadaClip
-        </h1>
+        <div className="flex flex-col items-center gap-3">
+          <Image src="/logo.png" alt="CanadaClip" width={80} height={80} className="rounded-full object-contain" />
+          <h1 className="text-[#E8EDF5] text-3xl font-bold">
+            CanadaClip
+          </h1>
+        </div>
         <p className="text-[#5A7A9E] text-sm mt-2">
           The GEO platform for Canadian small businesses
         </p>

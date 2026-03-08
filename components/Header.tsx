@@ -1,4 +1,5 @@
 import Link from "next/link";
+import Image from "next/image";
 import { auth0 } from "@/lib/auth0";
 import { getMerchantFromEmail } from "@/lib/merchantData";
 import { merchantData } from "@/lib/merchantData";
@@ -12,8 +13,9 @@ export async function Header() {
   return (
     <header className="sticky top-0 z-50 h-[52px] border-b border-[var(--border)] bg-[var(--surface)] flex items-center">
       <div className="max-w-[1600px] mx-auto px-8 w-full flex items-center justify-between">
-        <Link href="/dashboard" className="flex items-center gap-2 shrink-0 text-[var(--text-primary)] font-semibold transition-colors duration-150 hover:opacity-90">
-          CanadaClip
+        <Link href="/dashboard" className="flex items-center gap-2 shrink-0 transition-opacity duration-150 hover:opacity-90">
+          <Image src="/logo.png" alt="CanadaClip" width={32} height={32} className="rounded-full object-contain" />
+          <span className="text-[var(--text-primary)] font-semibold sr-only sm:not-sr-only">CanadaClip</span>
         </Link>
         <div className="absolute left-1/2 -translate-x-1/2">
           <DashboardNav />

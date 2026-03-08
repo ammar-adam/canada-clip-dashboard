@@ -9,22 +9,30 @@ export interface GeoSuggestion {
   keyword?: string;
 }
 
-const GEO_PROMPT = (listing: string) => `You are a GEO (Generative Engine Optimization) expert helping Canadian small businesses appear when users ask AI assistants for product recommendations. Analyze this product listing and return exactly 5 suggestions to improve discoverability in LLM search results like ChatGPT and Perplexity.
+const GEO_PROMPT = (listing: string) => `You are a GEO (Generative Engine Optimization) expert. Your job is to give Canadian small businesses clear, actionable wording feedback so their product listings get recommended by AI assistants (ChatGPT, Perplexity, Google AI Overviews).
 
-Return ONLY a JSON object, no markdown, no explanation. Use this exact structure:
+RULES FOR YOUR FEEDBACK:
+1. Be specific about wording. For each suggestion, give either (a) exact replacement phrasing the merchant can copy, or (b) a precise instruction with a full example sentence.
+2. Do not give vague advice like "improve clarity" or "add more details." Instead say exactly what to add and where (e.g. "In the first sentence, add the price: '[Product] — $89. Ships across Canada.'").
+3. Check for: (a) Price visible in the first 15 words, (b) Concrete specs (materials, dimensions, capacity, weight) not just "quality" or "durable", (c) Canadian/location signal in the first 2 sentences (e.g. "Made in Ontario", "Ships Canada-wide"), (d) No filler words ("best", "great", "perfect") — replace with factual claims, (e) Keywords a buyer would say to an AI (e.g. "waterproof backpack 30L", "GaN charger 65W").
+4. "fix" must be actionable: either a full sentence they can paste in, or "Replace X with Y" / "Add after the first sentence: [exact wording]."
+5. "impact" = High if the change strongly affects whether an LLM would recommend this product; Medium for clarity/specificity; Low for polish.
+
+Return ONLY valid JSON, no markdown, no code fence. Use this exact structure:
 {
   "suggestions": [
     {
-      "issue": "short issue title under 6 words",
-      "why": "one sentence why LLMs miss this listing",
-      "fix": "specific rewrite suggestion with example",
+      "issue": "short title under 6 words",
+      "why": "One sentence: why LLMs skip or downrank this listing.",
+      "fix": "Exact actionable wording: a sentence to add/replace, or 'Replace \"[current]\" with \"[new wording]\"' or 'Add after first sentence: \"[exact text]\"'.",
       "impact": "High or Medium or Low"
     }
   ],
-  "optimized_listing": "full rewritten product listing with all improvements applied (2-4 sentences, ready to use)"
+  "optimized_listing": "Full rewritten listing, 2-4 sentences. Include price early, Canadian/location signal, concrete specs. No markdown. Ready to paste on their website."
 }
 
-Product listing: ${listing}`;
+Product listing to analyze:
+${listing}`;
 
 export async function POST(req: Request) {
   const apiKey = process.env.GEMINI_API_KEY;

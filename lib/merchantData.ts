@@ -79,6 +79,8 @@ export type ClipPreview = {
   image: string;
   productName: string;
   price: string;
+  sourceDomain: string;
+  placeholderUrl: string;
 };
 
 export type MerchantData = {
@@ -163,7 +165,9 @@ export const merchantData: Record<MerchantId, MerchantData> = {
     clipPreview: {
       image: "/clip-backpack.png",
       productName: "City Pack 28L",
-      price: "$179",
+      price: "$129.00",
+      sourceDomain: "thenorthface.com",
+      placeholderUrl: "https://www.thenorthface.com/en-ca/p/ba...",
     },
     website: "https://northbound-backpacks.vercel.app",
   },
@@ -225,8 +229,10 @@ export const merchantData: Record<MerchantId, MerchantData> = {
     ],
     clipPreview: {
       image: "/clip-streetwear.png",
-      productName: "OG Heavyweight Tee",
-      price: "$65",
+      productName: "Urban Hoodie — Forest",
+      price: "$89.00",
+      sourceDomain: "thenorthface.com",
+      placeholderUrl: "https://www.herschel.com/en-ca/p/ho...",
     },
     website: "https://streetroot-co.vercel.app",
   },
@@ -288,8 +294,10 @@ export const merchantData: Record<MerchantId, MerchantData> = {
     ],
     clipPreview: {
       image: "/clip-electronics.png",
-      productName: "NorthCharge 20K",
-      price: "$89",
+      productName: "ProCharge Hub 65W",
+      price: "$64.00",
+      sourceDomain: "thenorthface.com",
+      placeholderUrl: "https://www.anker.com/products/hub...",
     },
     website: "https://northtech-goods.vercel.app",
   },
@@ -349,8 +357,10 @@ export const merchantData: Record<MerchantId, MerchantData> = {
     ],
     clipPreview: {
       image: "/clip-shawarma.png",
-      productName: "Classic Shawarma Plate",
-      price: "$14",
+      productName: "Loaded Shawarma Plate",
+      price: "$18.50",
+      sourceDomain: "thenorthface.com",
+      placeholderUrl: "https://www.ubereats.com/ca/store/...",
     },
     website: "https://shawarma-palace.vercel.app",
   },
