@@ -3,9 +3,9 @@
 import { useEffect, useState } from "react";
 
 function scoreColor(score: number) {
-  if (score <= 40) return "#C8102E";
-  if (score <= 70) return "#D4930A";
-  return "#0EA472";
+  if (score <= 40) return "var(--text-secondary)";
+  if (score <= 70) return "var(--accent)";
+  return "var(--accent)";
 }
 
 export function GeoScoreGauge({
@@ -46,7 +46,14 @@ export function GeoScoreGauge({
       <div className="flex flex-col items-center">
         <div className="relative w-28 h-28">
           <svg viewBox="0 0 100 100" className="w-full h-full -rotate-90">
-            <circle cx="50" cy="50" r="42" fill="none" stroke="#1A2E4A" strokeWidth="8" />
+            <circle
+              cx="50"
+              cy="50"
+              r="42"
+              fill="none"
+              stroke="var(--border)"
+              strokeWidth="8"
+            />
             <circle
               cx="50"
               cy="50"
@@ -60,36 +67,47 @@ export function GeoScoreGauge({
             />
           </svg>
           <span
-            className="absolute inset-0 flex items-center justify-center text-2xl font-bold tabular-nums"
+            className="absolute inset-0 flex items-center justify-center text-2xl font-bold tabular-nums tracking-tight"
             style={{ color: scoreColor(displayCurrent) }}
           >
             {displayCurrent}
           </span>
         </div>
-        <p className="mt-2 text-xs text-[#5A7A9E]">Current GEO Score</p>
+        <p className="mt-2 text-xs text-[var(--text-secondary)] font-mono uppercase">
+          Current GEO Score
+        </p>
       </div>
       {showProjected && (
         <div className="flex flex-col items-center">
           <div className="relative w-28 h-28">
             <svg viewBox="0 0 100 100" className="w-full h-full -rotate-90">
-              <circle cx="50" cy="50" r="42" fill="none" stroke="#1A2E4A" strokeWidth="8" />
               <circle
                 cx="50"
                 cy="50"
                 r="42"
                 fill="none"
-                stroke="#0EA472"
+                stroke="var(--border)"
+                strokeWidth="8"
+              />
+              <circle
+                cx="50"
+                cy="50"
+                r="42"
+                fill="none"
+                stroke="var(--accent)"
                 strokeWidth="8"
                 strokeLinecap="round"
                 strokeDasharray={`${(displayProjected / 100) * 264} 264`}
                 className="transition-all duration-100"
               />
             </svg>
-            <span className="absolute inset-0 flex items-center justify-center text-2xl font-bold tabular-nums text-[#0EA472]">
+            <span className="absolute inset-0 flex items-center justify-center text-2xl font-bold tabular-nums tracking-tight text-[var(--accent)]">
               {displayProjected}
             </span>
           </div>
-          <p className="mt-2 text-xs text-[#5A7A9E]">Projected</p>
+          <p className="mt-2 text-xs text-[var(--text-secondary)] font-mono uppercase">
+            Projected
+          </p>
         </div>
       )}
     </div>

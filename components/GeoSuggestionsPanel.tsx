@@ -20,9 +20,9 @@ export function GeoSuggestionsPanel({
   }, [loaded, suggestions.length]);
 
   const impactClass = (impact: string) => {
-    if (impact === "High") return "bg-[#1A0810] text-[#C8102E] border-[#2A1020]";
-    if (impact === "Medium") return "bg-[#1A1205] text-[#D4930A] border-[#2A1E08]";
-    return "bg-[#0B1628] text-[#5A7A9E] border-[#1A2E4A]";
+    if (impact === "High") return "bg-white/10 text-[var(--text-primary)] border-[var(--border)]";
+    if (impact === "Medium") return "bg-white/5 text-[var(--text-secondary)] border-[var(--border)]";
+    return "bg-transparent text-[var(--text-secondary)] border-[var(--border)]";
   };
 
   return (
@@ -30,21 +30,25 @@ export function GeoSuggestionsPanel({
       {suggestions.slice(0, visibleCount).map((s, i) => (
         <div
           key={i}
-          className="rounded-xl border border-[#1A2E4A] bg-[#0B1628] p-4 opacity-0 animate-[fadeIn_0.3s_ease-out_forwards] hover:bg-[#0F1E36] transition-all"
+          className="rounded-xl border border-[var(--border)] bg-[var(--surface)] p-4 opacity-0 animate-[fadeIn_0.3s_ease-out_forwards] transition-all duration-150 hover:shadow-[0_0_0_1px_rgba(255,255,255,0.12)]"
           style={{ animationDelay: `${i * 0.05}s` }}
         >
           <div className="flex items-start justify-between gap-2">
-            <h3 className="text-sm font-semibold text-[#E8EDF5]">{s.issue}</h3>
+            <h3 className="text-sm font-semibold text-[var(--text-primary)]">
+              {s.issue}
+            </h3>
             <span
-              className={`shrink-0 rounded border px-2 py-0.5 text-xs font-medium ${impactClass(
+              className={`shrink-0 rounded border px-2 py-0.5 text-xs font-medium font-mono uppercase ${impactClass(
                 s.impact
               )}`}
             >
               {s.impact}
             </span>
           </div>
-          <p className="mt-1 text-xs text-[#5A7A9E]">{s.why}</p>
-          <p className="mt-2 text-sm text-[#5A9ED4] font-mono bg-[#051525] rounded p-2 border border-[#1A2E4A]">
+          <p className="mt-1 text-xs text-[var(--text-secondary)]">
+            {s.why}
+          </p>
+          <p className="mt-2 text-sm text-[var(--accent)] font-mono bg-black/20 rounded p-2 border border-[var(--border)]">
             {s.fix}
           </p>
         </div>

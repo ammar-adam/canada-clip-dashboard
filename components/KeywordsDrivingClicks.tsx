@@ -14,32 +14,38 @@ export function KeywordsDrivingClicks({ selectedProduct }: { selectedProduct: st
   const topKeyword = keywords.length ? keywords.reduce((a, b) => (a.purchases >= b.purchases ? a : b)).word : "";
 
   return (
-    <div className="rounded-xl border border-[#1A2E4A] bg-[#0B1628] p-6 hover:bg-[#0F1E36] hover:border-[#1E3A5C] transition-all duration-200">
-      <h2 className="text-lg font-semibold text-[#E8EDF5]">
+    <div className="rounded-xl border border-[var(--border)] bg-[var(--surface)] p-6 transition-shadow duration-150 hover:shadow-[0_0_0_1px_rgba(255,255,255,0.12)]">
+      <h2 className="text-lg font-semibold text-[var(--text-primary)]">
         Keywords driving performance on this product
       </h2>
-      <p className="text-sm text-[#5A7A9E] mt-0.5">
+      <p className="text-sm text-[var(--text-secondary)] mt-0.5 font-mono">
         From App Clip searches — last 30 days
       </p>
       <div className="flex flex-wrap gap-3 mt-4">
         {keywords.map((k) => (
           <div
             key={k.word}
-            className="rounded-xl border border-[#1A2E4A] bg-[#0B1628] p-4 min-w-[140px] hover:bg-[#0F1E36] hover:border-[#1E3A5C] transition-all duration-200"
+            className="rounded-xl border border-[var(--border)] bg-[var(--surface)] p-4 min-w-[140px] transition-shadow duration-150 hover:shadow-[0_0_0_1px_rgba(255,255,255,0.12)]"
           >
-            <p className="text-sm font-mono font-bold text-[#5A9ED4] mb-3">
+            <p className="text-sm font-mono font-bold text-[var(--accent)] mb-3">
               &quot;{k.word}&quot;
             </p>
-            <div className="space-y-1.5 text-xs">
-              <p className="text-[#5A7A9E]">👁 Views: {k.views.toLocaleString()}</p>
-              <p className="text-[#D4930A]">👆 Clicks: {k.clicks.toLocaleString()}</p>
-              <p className="text-[#0EA472]">💰 Purchases: {k.purchases.toLocaleString()}</p>
+            <div className="space-y-1.5 text-xs font-mono tabular-tight">
+              <p className="text-[var(--text-secondary)]">
+                Views: {k.views.toLocaleString()}
+              </p>
+              <p className="text-[var(--text-secondary)]">
+                Clicks: {k.clicks.toLocaleString()}
+              </p>
+              <p className="text-[var(--text-primary)]">
+                Purchases: {k.purchases.toLocaleString()}
+              </p>
             </div>
           </div>
         ))}
       </div>
       {topKeyword && (
-        <div className="mt-4 rounded-lg border border-[#1A3A5C] bg-[#051525] p-3 text-sm text-[#5A7A9E]">
+        <div className="mt-4 rounded-lg border border-[var(--border)] bg-black/20 p-3 text-sm text-[var(--text-secondary)] font-mono">
           💡 &quot;{topKeyword}&quot; drives the most purchases. Consider featuring it in your product title and first sentence.
         </div>
       )}

@@ -161,7 +161,7 @@ export const merchantData: Record<MerchantId, MerchantData> = {
       { day: "Sun", Jansport: 9, Herschel: 7, "North Face": 4, Others: 2 },
     ],
     clipPreview: {
-      image: "https://images.unsplash.com/photo-1553062407-98eeb64c6a62?w=200",
+      image: "/clip-backpack.png",
       productName: "City Pack 28L",
       price: "$179",
     },
@@ -224,7 +224,7 @@ export const merchantData: Record<MerchantId, MerchantData> = {
       { day: "Sun", Supreme: 12, Stussy: 8, Palace: 4, Others: 2 },
     ],
     clipPreview: {
-      image: "https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?w=200",
+      image: "/clip-streetwear.png",
       productName: "OG Heavyweight Tee",
       price: "$65",
     },
@@ -287,7 +287,7 @@ export const merchantData: Record<MerchantId, MerchantData> = {
       { day: "Sun", Anker: 18, Belkin: 11, Mophie: 6, Others: 3 },
     ],
     clipPreview: {
-      image: "https://images.unsplash.com/photo-1609091839311-d5365f9ff1c5?w=200",
+      image: "/clip-electronics.png",
       productName: "NorthCharge 20K",
       price: "$89",
     },
@@ -348,7 +348,7 @@ export const merchantData: Record<MerchantId, MerchantData> = {
       { day: "Sun", "McDonald's": 7, Subway: 5, "Tim Hortons": 3, Others: 2 },
     ],
     clipPreview: {
-      image: "https://images.unsplash.com/photo-1529006557810-274b9b2fc783?w=200",
+      image: "/clip-shawarma.png",
       productName: "Classic Shawarma Plate",
       price: "$14",
     },

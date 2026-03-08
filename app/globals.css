@@ -3,36 +3,28 @@
 @tailwind utilities;
 
 :root {
-  /* Backgrounds */
-  --bg-base: #050c1a;
-  --bg-card: #0b1628;
-  --bg-card-hover: #0f1e36;
-  --bg-elevated: #132040;
-
-  /* Borders */
-  --border-subtle: #1a2e4a;
-  --border-active: #c8102e;
-
-  /* Text */
-  --text-primary: #e8edf5;
-  --text-secondary: #5a7a9e;
-  --text-muted: #2e4a6b;
-
-  /* Accents */
-  --red-primary: #c8102e;
-  --red-hover: #e8132f;
-  --red-subtle: #1a0810;
-  --green: #0ea472;
-  --green-subtle: #051a12;
-  --yellow: #d4930a;
-  --blue-accent: #1e6fd4;
+  /* Design: Linear / Vercel / Bloomberg — surgical, professional */
+  --bg: #09090b;
+  --surface: #111113;
+  --border: #1c1c1f;
+  --text-primary: #fafafa;
+  --text-secondary: #71717a;
+  --accent: #e0f2fe;
+  /* Legacy aliases for gradual migration */
+  --bg-base: #09090b;
+  --bg-card: #111113;
+  --bg-card-hover: #18181b;
+  --border-subtle: #1c1c1f;
+  --text-muted: #71717a;
 }
 
 body {
-  background-color: var(--bg-base);
+  background-color: var(--bg);
   color: var(--text-primary);
+  font-feature-settings: "tnum";
 }
 
+/* Monochrome chart opacity scale: 85%, 60%, 40%, 20% */
 @keyframes fadeIn {
   from {
     opacity: 0;
@@ -42,4 +34,59 @@ body {
     opacity: 1;
     transform: translateY(0);
   }
+}
+
+@keyframes fadeUp {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Grain overlay */
+.grain-overlay {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 9999;
+  opacity: 0.025;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+}
+
+/* Detail panel animation */
+@keyframes panelSlideIn {
+  from {
+    transform: translateX(100%);
+  }
+  to {
+    transform: translateX(0);
+  }
+}
+
+.panel-slide-in {
+  animation: panelSlideIn 260ms cubic-bezier(0.32, 0, 0, 1) forwards;
+}
+
+/* Numbers: tabular, tight */
+.tabular-tight {
+  font-variant-numeric: tabular-nums;
+  letter-spacing: -0.02em;
+}
+
+/* Live dot pulse */
+@keyframes livePulse {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50% { opacity: 0.6; transform: scale(1.1); }
+}
+
+.live-dot {
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: white;
+  animation: livePulse 2s ease-in-out infinite;
 }

@@ -22,23 +22,23 @@ export function ClipPerformance() {
   };
 
   return (
-    <div className="rounded-xl border border-[#1A2E4A] bg-[#0B1628] p-6 hover:bg-[#0F1E36] hover:border-[#1E3A5C] transition-all duration-200">
-      <h2 className="text-lg font-semibold text-[#E8EDF5] mb-4">
+    <div className="rounded-xl border border-[var(--border)] bg-[var(--surface)] p-6 transition-shadow duration-150 hover:shadow-[0_0_0_1px_rgba(255,255,255,0.12)]">
+      <h2 className="text-lg font-semibold text-[var(--text-primary)] mb-4">
         Clip performance
       </h2>
       <div className="grid grid-cols-2 gap-4">
         {metrics.map((m) => (
           <div
             key={m.label}
-            className="rounded-xl border border-[#1A2E4A] bg-[#0B1628] p-4 hover:bg-[#0F1E36] hover:border-[#1E3A5C] transition-all duration-200"
+            className="rounded-xl border border-[var(--border)] bg-[var(--surface)] p-4 transition-shadow duration-150 hover:shadow-[0_0_0_1px_rgba(255,255,255,0.12)]"
           >
-            <div className="flex items-center gap-2 text-[#5A7A9E]">
+            <div className="flex items-center gap-2 text-[var(--text-secondary)]">
               <m.icon className="w-4 h-4" />
-              <span className="text-xs font-semibold uppercase tracking-widest">
+              <span className="text-xs font-semibold uppercase tracking-widest font-mono">
                 {m.label}
               </span>
             </div>
-            <p className="mt-2 text-xl font-bold tabular-nums text-[#E8EDF5]">
+            <p className="mt-2 text-xl font-bold tabular-nums tracking-tight text-[var(--text-primary)]">
               {m.key === "revenue"
                 ? `$${values[m.key].toLocaleString()}`
                 : values[m.key].toLocaleString()}

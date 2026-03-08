@@ -99,20 +99,22 @@ export default function GeoPage() {
   return (
     <div className="space-y-8">
       <div>
-        <h1 className="text-2xl font-semibold text-[#E8EDF5]">GEO Optimizer</h1>
-        <p className="text-[#5A7A9E] mt-1 text-sm">
+        <h1 className="text-2xl font-semibold text-[var(--text-primary)]">
+          GEO Optimizer
+        </h1>
+        <p className="text-[var(--text-secondary)] mt-1 text-sm font-mono">
           Improve your discoverability in LLM search results with Gemini AI.
         </p>
       </div>
 
-      <div className="rounded-xl border border-[#1A2E4A] bg-[#0B1628] p-6 hover:bg-[#0F1E36] hover:border-[#1E3A5C] transition-all duration-200">
-        <label className="block text-xs font-semibold uppercase tracking-widest text-[#5A7A9E] mb-2">
+      <div className="rounded-xl border border-[var(--border)] bg-[var(--surface)] p-6 transition-shadow duration-150 hover:shadow-[0_0_0_1px_rgba(255,255,255,0.12)]">
+        <label className="block text-xs font-semibold uppercase tracking-widest text-[var(--text-secondary)] mb-2">
           Select a product to optimize
         </label>
         <select
           value={selectedProduct}
           onChange={handleProductChange}
-          className="w-full max-w-md rounded-lg border border-[#1A2E4A] bg-[#0B1628] text-[#E8EDF5] px-4 py-2.5 text-sm focus:border-[#C8102E] focus:ring-0 focus:outline-none"
+          className="w-full max-w-md rounded-lg border border-[var(--border)] bg-[var(--surface)] text-[var(--text-primary)] px-4 py-2.5 text-sm font-mono focus:border-[var(--accent)] focus:ring-0 focus:outline-none transition-colors duration-150"
         >
           {data.products.map((p) => (
             <option key={p} value={p}>
@@ -124,32 +126,36 @@ export default function GeoPage() {
 
       <KeywordsDrivingClicks selectedProduct={selectedProduct} />
 
-      <div className="rounded-xl border border-[#1A2E4A] bg-[#0B1628] p-6 hover:bg-[#0F1E36] hover:border-[#1E3A5C] transition-all duration-200">
-        <h2 className="text-base font-semibold text-[#E8EDF5] mb-3">
+      <div className="rounded-xl border border-[var(--border)] bg-[var(--surface)] p-6 transition-shadow duration-150 hover:shadow-[0_0_0_1px_rgba(255,255,255,0.12)]">
+        <h2 className="text-base font-semibold text-[var(--text-primary)] mb-3">
           Current listing
         </h2>
         <textarea
           value={listing}
           onChange={(e) => setListing(e.target.value)}
           rows={5}
-          className="w-full rounded-xl border border-[#1A2E4A] bg-[#0B1628] text-[#E8EDF5] p-4 text-sm font-mono min-h-32 focus:border-[#C8102E] focus:ring-0 focus:outline-none"
+          className="w-full rounded-xl border border-[var(--border)] bg-[var(--surface)] text-[var(--text-primary)] p-4 text-sm font-mono min-h-32 focus:border-[var(--accent)] focus:ring-0 focus:outline-none transition-colors duration-150 placeholder:text-[var(--text-secondary)]"
           placeholder="Product description..."
         />
         <button
           onClick={handleAnalyze}
           disabled={loading}
-          className="mt-4 inline-flex items-center gap-2 rounded-lg bg-[#C8102E] hover:bg-[#0F1E36] text-white font-semibold px-4 py-2 border border-[#1A2E4A] disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+          className="mt-4 inline-flex items-center gap-2 rounded-lg bg-[var(--accent)] text-[var(--bg)] font-semibold px-4 py-2 border border-[var(--border)] disabled:opacity-50 disabled:cursor-not-allowed transition-colors duration-150 hover:shadow-[0_0_0_1px_rgba(255,255,255,0.12)]"
         >
           <Sparkles className="w-4 h-4" />
           {loading ? "Analyzing…" : "Analyze with Gemini AI"}
         </button>
-        {error && <p className="mt-3 text-sm text-[#C8102E]">{error}</p>}
+        {error && (
+          <p className="mt-3 text-sm text-[var(--text-secondary)] font-mono">
+            {error}
+          </p>
+        )}
       </div>
 
       {analysisDone && (
         <>
-          <div className="rounded-xl border border-[#1A2E4A] bg-[#0B1628] p-6">
-            <h2 className="text-base font-semibold text-[#E8EDF5] mb-4">
+          <div className="rounded-xl border border-[var(--border)] bg-[var(--surface)] p-6 transition-shadow duration-150 hover:shadow-[0_0_0_1px_rgba(255,255,255,0.12)]">
+            <h2 className="text-base font-semibold text-[var(--text-primary)] mb-4">
               GEO Score
             </h2>
             <GeoScoreGauge
@@ -160,8 +166,8 @@ export default function GeoPage() {
             />
           </div>
 
-          <div className="rounded-xl border border-[#1A2E4A] bg-[#0B1628] p-6">
-            <h2 className="text-base font-semibold text-[#E8EDF5] mb-4">
+          <div className="rounded-xl border border-[var(--border)] bg-[var(--surface)] p-6 transition-shadow duration-150 hover:shadow-[0_0_0_1px_rgba(255,255,255,0.12)]">
+            <h2 className="text-base font-semibold text-[var(--text-primary)] mb-4">
               Suggestions
             </h2>
             <GeoSuggestionsPanel suggestions={suggestions} loaded={analysisDone} />
@@ -174,11 +180,11 @@ export default function GeoPage() {
                 after={optimizedListing}
                 loaded={true}
               />
-              <div className="rounded-xl border border-[#1A2E4A] bg-[#0B1628] p-6">
+              <div className="rounded-xl border border-[var(--border)] bg-[var(--surface)] p-6 transition-shadow duration-150 hover:shadow-[0_0_0_1px_rgba(255,255,255,0.12)]">
                 <button
                   onClick={handleApplyToWebsite}
                   disabled={applying}
-                  className="inline-flex items-center gap-2 rounded-lg bg-[#C8102E] hover:bg-[#0F1E36] text-white font-semibold px-4 py-2 border border-[#1A2E4A] disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                  className="inline-flex items-center gap-2 rounded-lg bg-[var(--accent)] text-[var(--bg)] font-semibold px-4 py-2 border border-[var(--border)] disabled:opacity-50 disabled:cursor-not-allowed transition-colors duration-150 hover:shadow-[0_0_0_1px_rgba(255,255,255,0.12)]"
                 >
                   {applying ? (
                     <>Updating your website…</>
@@ -190,13 +196,13 @@ export default function GeoPage() {
                   )}
                 </button>
                 {applySuccess && (
-                  <div className="mt-4 p-3 rounded-lg border border-[#0EA472]/30 bg-[#051A12] text-sm text-[#0EA472]">
+                  <div className="mt-4 p-3 rounded-lg border border-[var(--accent)]/30 bg-[var(--accent)]/10 text-sm text-[var(--accent)] font-mono">
                     ✅ Your website has been updated.{" "}
                     <a
                       href={data.website}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="underline font-medium text-[#0EA472]"
+                      className="underline font-medium"
                     >
                       View live on {data.website.replace(/^https?:\/\//, "")} →
                     </a>

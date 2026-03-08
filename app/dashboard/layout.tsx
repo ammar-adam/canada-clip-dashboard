@@ -15,9 +15,10 @@ export default async function DashboardLayout({
 
   return (
     <MerchantProvider merchantId={merchantId}>
-      <div className="min-h-screen bg-[var(--bg-base)]">
+      <div className="min-h-screen bg-[var(--bg)]">
+        <div className="grain-overlay" aria-hidden />
         <Header />
-        <main className="max-w-7xl mx-auto px-6 py-8">{children}</main>
+        <main className="max-w-[1600px] mx-auto px-8 py-8">{children}</main>
       </div>
     </MerchantProvider>
   );
