@@ -1,38 +1,175 @@
-# Canada Clip — Backend + Frontend
+# CanadaClip 🍁
 
-This repo contains two parts of the Canada Clip project in separate folders so both are easy to find and run.
+*Big brands stole your customers. We steal them back.*
 
----
+[![Next.js](https://img.shields.io/badge/Next.js-14-black?style=for-the-badge&logo=next.js)](https://nextjs.org/) [![Swift](https://img.shields.io/badge/Swift-5.0-FA7343?style=for-the-badge&logo=swift)](https://swift.org/) [![Gemini](https://img.shields.io/badge/Gemini-API-4285F4?style=for-the-badge&logo=google)](https://ai.google.dev/) [![Supabase](https://img.shields.io/badge/Supabase-Postgres-3ECF8E?style=for-the-badge&logo=supabase)](https://supabase.com/) [![Auth0](https://img.shields.io/badge/Auth0-Identity-EB5424?style=for-the-badge&logo=auth0)](https://auth0.com/) [![Vercel](https://img.shields.io/badge/Vercel-Deploy-000000?style=for-the-badge&logo=vercel)](https://vercel.com/) [![Tailwind](https://img.shields.io/badge/Tailwind-CSS-06B6D4?style=for-the-badge&logo=tailwindcss)](https://tailwindcss.com/)
 
-## Backend (dashboard)
-
-**Location:** [`backend/`](./backend)  
-**Author:** Your Next.js dashboard and APIs.
-
-Merchant-facing dashboard for CanadaClip — track customers stolen from big brands via AI-powered App Clips and get GEO optimization suggestions.
-
-- **Stack:** Next.js 14, TypeScript, Tailwind, Recharts, Gemini API
-- **Run:** `cd backend && npm install && npm run dev` → [http://localhost:3000](http://localhost:3000)
-- **Details:** See [backend/README.md](./backend/README.md)
+[![Hack Canada 2026](https://img.shields.io/badge/Hack_Canada-2026-FF6B35?style=for-the-badge)](https://hackcanada.com/)
 
 ---
 
-## Frontend (App Clip simulator)
+## 💥 **The Problem**
 
-**Location:** [`frontend/`](./frontend)  
-**Author:** [Pranav Marthi](https://github.com/PranavMarthi) — [canadaclips](https://github.com/PranavMarthi/canadaclips).
+> **Nike spends $4,000,000,000 per year on marketing.** That's $11M every single day.  
+> Shawarma Palace on Bloor spends $0 — and wonders why AI never recommends them.
 
-Reactiv ClipKit Lab: iOS App Clip simulator for Hack Canada. Build and test App Clip experiences (Swift/Xcode) without entitlements or an Apple Developer account.
-
-- **Stack:** Swift, SwiftUI, Xcode 26+
-- **Run:** Open `frontend/ReactivChallengeKit/ReactivChallengeKit.xcodeproj` in Xcode, then Build & Run (Cmd+R)
-- **Details:** See [frontend/README.md](./frontend/README.md)
+**58% of consumers** now rely on AI for product recommendations. When ChatGPT suggests a jacket, it suggests The North Face — not the Canadian indie brand. **GEO (Generative Engine Optimization)** is the new SEO: the rules of how products get surfaced in LLM answers. **98% of Canadian SMBs** have never heard of it. We're here to change that.
 
 ---
 
-## Quick start
+## 📱 **How It Works**
 
-| What you want to run | Command / action |
-|----------------------|------------------|
-| **Dashboard (backend)** | `cd backend && npm run dev` |
-| **App Clip simulator (frontend)** | Open `frontend/ReactivChallengeKit/ReactivChallengeKit.xcodeproj` in Xcode → Cmd+R |
+### Consumer flow
+
+| Step | What happens |
+|------|----------------|
+| 🤖 | User gets a Nike / Amazon / ASOS link from ChatGPT |
+| 📱 | **Reactiv App Clip** activates instantly in Safari — **no download** |
+| ✨ | **Gemini** surfaces 3–4 Canadian alternative businesses |
+| 🛍️ | **Shopify** checkout in one tap |
+
+### Merchant flow
+
+| Step | What happens |
+|------|----------------|
+| 🔐 | **Auth0** login → isolated merchant dashboard |
+| 📊 | See exactly which customers big brands are stealing |
+| 🧠 | **Gemini GEO Optimizer** analyzes your listings |
+| ⚡ | One click → **live storefront updates** instantly via **Supabase** |
+
+---
+
+## 🏗️ **Architecture**
+
+![Architecture](./architecture.png)
+
+---
+
+## 🔄 **The Flywheel**
+
+```
+   Consumer Clip Events
+            ↓
+   Merchant Analytics  ←───  More Traffic
+            ↓                      ↑
+   GEO Improvements  ───→  Better Listings
+```
+
+*Steal traffic → measure it → optimize with AI → steal more.*
+
+---
+
+## 🛠️ **Tech Stack**
+
+| Layer | Technology | Purpose |
+|-------|------------|---------|
+| **App Clip** | Swift, SwiftUI, Reactiv ClipKit | Instant, no-install consumer experience |
+| **Dashboard** | Next.js 14, TypeScript, Tailwind, Recharts | Merchant analytics & GEO tools |
+| **Auth** | Auth0 | Isolated merchant tenants (4 stores) |
+| **AI** | Gemini API | Alternative discovery + GEO optimizer |
+| **Database** | Supabase (Postgres + Realtime) | Listings, analytics, live updates |
+| **Hosting** | Vercel | Dashboard + 4 merchant storefronts |
+| **Checkout** | Shopify | One-tap purchase from the clip |
+
+---
+
+## ⚡ **Quick Start**
+
+### Backend (dashboard)
+
+```bash
+cd backend
+npm install
+cp .env.example .env.local   # fill in keys
+npm run dev                   # http://localhost:3000
+```
+
+### Frontend (App Clip)
+
+- Open `frontend/ReactivChallengeKit/ReactivChallengeKit.xcodeproj` in **Xcode**
+- **Requirements:** Xcode 26+, iOS 17+ simulator
+- **Build & Run:** `Cmd+R`
+
+---
+
+## 🔑 **Environment Variables**
+
+| Variable | Required | Purpose |
+|----------|----------|---------|
+| `NEXT_PUBLIC_SUPABASE_URL` | ✅ | Supabase project URL |
+| `NEXT_PUBLIC_SUPABASE_ANON_KEY` | ✅ | Supabase anon key |
+| `SUPABASE_SERVICE_ROLE_KEY` | ✅ | Supabase service role (GEO updates) |
+| `AUTH0_SECRET` | ✅ | Auth0 session secret |
+| `AUTH0_BASE_URL` | ✅ | App URL (e.g. `https://canada-clip-dashboard.vercel.app`) |
+| `AUTH0_ISSUER_BASE_URL` | ✅ | Auth0 tenant URL (no trailing slash) |
+| `AUTH0_CLIENT_ID` | ✅ | Auth0 application client ID |
+| `AUTH0_CLIENT_SECRET` | ✅ | Auth0 application client secret |
+| `GEMINI_API_KEY` | ✅ | Google AI Studio API key |
+
+Copy `backend/.env.example` to `backend/.env.local` and fill in values.
+
+---
+
+## 🔗 **Live Demo**
+
+| Link | Description |
+|------|-------------|
+| 🔗 [**Dashboard**](https://canada-clip-dashboard.vercel.app) | Merchant GEO dashboard |
+| 🎒 [**Northbound Packs**](https://northbound-backpacks.vercel.app) | Merchant storefront |
+| 🧥 [**StreetRoot Co**](https://streetroot-co.vercel.app) | Merchant storefront |
+| 🔌 [**NorthTech Goods**](https://northtech-goods.vercel.app) | Merchant storefront |
+| 🥙 [**Shawarma Palace**](https://shawarma-palace.vercel.app) | Merchant storefront |
+
+*Open the dashboard, then hit a merchant storefront and watch GEO in action.*
+
+---
+
+## 👥 **Team**
+
+| Name | Role |
+|------|------|
+| **Ammar Adam** | Dashboard, backend, architecture |
+| **Pranav Marthi** | iOS App Clip (SwiftUI + Reactiv ClipKit) |
+| **Roderick** | [role] (remote from Toronto) |
+
+---
+
+## 🏆 **Prizes We're Targeting**
+
+Reactiv ClipKit Lab ($5K) · Google Build with AI · SPUR Founder Track · MLH Auth0 · MLH Gemini API · Overall
+
+---
+
+## 📢 **Build in Public**
+
+Full LinkedIn documentation of the build — from Friday night ideation through Saturday judging:
+
+- **Post 1:** [LinkedIn](https://www.linkedin.com/feed/update/urn:li:activity:7435902965711912960/)
+- **Post 2:** [LinkedIn](https://www.linkedin.com/feed/update/urn:li:activity:7436121175396859905/)
+- **Post 3:** [LinkedIn](https://www.linkedin.com/feed/update/urn:li:activity:7436197431433723904/)
+- **Post 4:** [LinkedIn](https://www.linkedin.com/feed/update/urn:li:activity:7436280429051138048/)
+
+### Walkthroughs
+
+| Video | Link |
+|-------|------|
+| 📐 Architecture | [Loom](https://www.loom.com/share/100ad7c247234142b147d6d53030aa96) |
+| 🎨 Frontend | [Loom](https://www.loom.com/share/6bf8454b60884548a467eee4c5e2b815) |
+| ⚙️ Backend | [Loom](https://www.loom.com/share/32dd42931c0f4190ae05e0f3d47f1879) |
+| ✨ Animated demo | [Google Drive](https://drive.google.com/file/d/1y2qr6llciL2pgqPU5PtuVDP4nNlAj5ih/view) · [YouTube](https://www.youtube.com/watch?v=as1ukU6VLSk) |
+
+---
+
+## 📁 **Repo Structure**
+
+```
+canada-clip-dashboard/
+├── backend/     ← Next.js 14 dashboard (Vercel)
+└── frontend/    ← Swift/SwiftUI App Clip (Reactiv ClipKit)
+```
+
+---
+
+*Built in 36 hours at Hack Canada 2026 · Waterloo, Ontario*
+
+**Try the live dashboard → then steal some traffic back.**
