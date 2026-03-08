@@ -1,5 +1,6 @@
 import { GoogleGenerativeAI } from "@google/generative-ai";
 import { NextResponse } from "next/server";
+import { createServerClient } from "@/lib/supabase";
 
 export interface GeoSuggestion {
   issue: string;
@@ -34,71 +35,110 @@ Return ONLY valid JSON, no markdown, no code fence. Use this exact structure:
 Product listing to analyze:
 ${listing}`;
 
+const GEMINI_MODELS = ["gemini-2.0-flash", "gemini-1.5-flash", "gemini-1.5-pro"] as const;
+
+function parseGeminiResponse(text: string): { suggestions: GeoSuggestion[]; optimizedListing: string } {
+  let raw = text.trim();
+  if (raw.startsWith("```")) {
+    raw = raw.replace(/^```(?:json)?\s*/, "").replace(/\s*```$/, "");
+  }
+  const parsed = JSON.parse(raw);
+  const suggestions: GeoSuggestion[] = Array.isArray(parsed.suggestions)
+    ? parsed.suggestions
+    : Array.isArray(parsed)
+      ? parsed
+      : [];
+  const optimizedListing =
+    typeof parsed.optimized_listing === "string"
+      ? parsed.optimized_listing.trim()
+      : typeof parsed.optimizedListing === "string"
+        ? parsed.optimizedListing.trim()
+        : "";
+  return { suggestions, optimizedListing };
+}
+
 export async function POST(req: Request) {
   const apiKey = process.env.GEMINI_API_KEY;
   if (!apiKey) {
     return NextResponse.json(
-      { error: "GEMINI_API_KEY is not set" },
-      { status: 500 }
+      {
+        error: "API key not configured",
+        code: "GEMINI_API_KEY_NOT_SET",
+        message: "Add GEMINI_API_KEY to your .env.local to enable analysis. Get a key at https://aistudio.google.com/apikey",
+      },
+      { status: 503 }
     );
   }
 
+  let listing: string;
+  let merchantId: string | undefined;
+  let productName: string | undefined;
   try {
-    const { listing } = await req.json();
-    if (!listing || typeof listing !== "string") {
-      return NextResponse.json(
-        { error: "Missing or invalid listing" },
-        { status: 400 }
-      );
+    const body = await req.json();
+    listing = body.listing;
+    merchantId = typeof body.merchant_id === "string" ? body.merchant_id : undefined;
+    productName = typeof body.product_name === "string" ? body.product_name : undefined;
+  } catch {
+    return NextResponse.json(
+      { error: "Invalid request body" },
+      { status: 400 }
+    );
+  }
+
+  if (!listing || typeof listing !== "string") {
+    return NextResponse.json(
+      { error: "Missing or invalid listing" },
+      { status: 400 }
+    );
+  }
+
+  const genAI = new GoogleGenerativeAI(apiKey);
+  let suggestions: GeoSuggestion[] = [];
+  let optimizedListing = "";
+
+  for (const modelId of GEMINI_MODELS) {
+    try {
+      const model = genAI.getGenerativeModel({ model: modelId });
+      const result = await model.generateContent(GEO_PROMPT(listing));
+      const text = result.response.text();
+      if (!text) continue;
+      const parsed = parseGeminiResponse(text);
+      if (parsed.suggestions.length === 0) continue;
+      suggestions = parsed.suggestions;
+      optimizedListing = parsed.optimizedListing;
+      break;
+    } catch (e) {
+      console.warn(`GEO API: model ${modelId} failed`, e);
+      continue;
     }
+  }
 
-    const genAI = new GoogleGenerativeAI(apiKey);
-    const model = genAI.getGenerativeModel({ model: "gemini-2.0-flash" });
-
-    const result = await model.generateContent(GEO_PROMPT(listing));
-    const text = result.response.text();
-    if (!text) {
-      return NextResponse.json(
-        { error: "No response from Gemini" },
-        { status: 500 }
-      );
-    }
-
-    let raw = text.trim();
-    if (raw.startsWith("```")) {
-      raw = raw.replace(/^```(?:json)?\s*/, "").replace(/\s*```$/, "");
-    }
-    const parsed = JSON.parse(raw);
-    const suggestions: GeoSuggestion[] = Array.isArray(parsed.suggestions)
-      ? parsed.suggestions
-      : Array.isArray(parsed)
-        ? parsed
-        : [];
-    const optimizedListing: string =
-      typeof parsed.optimized_listing === "string"
-        ? parsed.optimized_listing.trim()
-        : typeof parsed.optimizedListing === "string"
-          ? parsed.optimizedListing.trim()
-          : "";
-
-    if (suggestions.length === 0) {
-      return NextResponse.json(
-        { error: "Invalid suggestions format" },
-        { status: 500 }
-      );
-    }
-
-    return NextResponse.json({ suggestions, optimizedListing });
-  } catch (e) {
-    console.error("GEO API error:", e);
+  if (suggestions.length === 0) {
     const fallback: GeoSuggestion[] = [
       { issue: "Missing price signals", why: "LLMs prioritize listings with clear pricing.", fix: "Add price to the first sentence, e.g. 'Starting at $89.'", impact: "High" },
       { issue: "Vague descriptors", why: "Generic terms like 'quality' are not searchable.", fix: "Use specific materials and features, e.g. 'YKK zippers, 28L capacity'.", impact: "Medium" },
       { issue: "No geographic signal", why: "Canadian buyers search for local options.", fix: "Add 'Ships across Canada' or 'Made in Ontario' early in the listing.", impact: "High" },
     ];
-    return NextResponse.json({
-      suggestions: fallback,
-      optimizedListing: "",
-    });
+    suggestions = fallback;
   }
+
+  // Write to Supabase if we have merchant + product and a client
+  if (merchantId && productName) {
+    const supabase = createServerClient();
+    if (supabase) {
+      try {
+        await supabase.from("geo_analyses").insert({
+          merchant_id: merchantId,
+          product_name: productName,
+          original_listing: listing.slice(0, 10000),
+          optimized_listing: optimizedListing.slice(0, 10000),
+          suggestions: suggestions as unknown as Record<string, unknown>[],
+        });
+      } catch (e) {
+        console.error("GEO: Supabase insert failed", e);
+      }
+    }
+  }
+
+  return NextResponse.json({ suggestions, optimizedListing });
 }

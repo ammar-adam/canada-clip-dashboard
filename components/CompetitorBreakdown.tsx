@@ -24,7 +24,7 @@ export function CompetitorBreakdown({
             type="button"
             key={row.name}
             onClick={() => onBrandClick?.(row.name)}
-            className="flex items-center gap-3 rounded-lg px-3 py-2 w-full text-left transition-colors duration-150 hover:bg-[#ffffff08] hover:border-l hover:border-l-white border-l border-l-transparent focus:outline-none"
+            className="flex items-center gap-3 rounded-lg px-3 py-2 w-full text-left transition-colors duration-150 hover:bg-[#2a2a2a] hover:border-l hover:border-l-white border-l border-l-transparent focus:outline-none cursor-pointer"
           >
             <span className="w-24 text-sm text-[var(--text-primary)] shrink-0 font-mono lowercase">
               {row.name.toLowerCase()}

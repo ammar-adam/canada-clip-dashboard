@@ -23,7 +23,7 @@ export function DashboardNav() {
           <Link
             key={href}
             href={href}
-            className={`flex items-center gap-2 px-1 py-2 text-sm font-medium border-b-2 transition-colors duration-150 ${
+            className={`flex items-center gap-2 px-1 py-2 text-sm font-medium border-b-2 transition-colors duration-150 cursor-pointer ${
               isActive
                 ? "text-[var(--text-primary)] border-[var(--accent)]"
                 : "text-[var(--text-secondary)] border-transparent hover:text-[var(--text-primary)]"

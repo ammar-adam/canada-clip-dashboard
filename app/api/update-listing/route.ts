@@ -26,15 +26,18 @@ export async function POST(req: Request) {
       );
     }
 
-    const row = {
+    const table = process.env.SUPABASE_LISTINGS_TABLE || "merchant_listings";
+    const descriptionColumn = process.env.SUPABASE_DESCRIPTION_COLUMN || "description";
+
+    const row: Record<string, unknown> = {
       merchant_id: String(merchant_id).slice(0, 50),
       product_name: String(product_name).slice(0, 200),
-      description: String(description).slice(0, 5000),
+      [descriptionColumn]: String(description).slice(0, 5000),
       updated_at: new Date().toISOString(),
     };
 
     const { data, error } = await supabase
-      .from("merchant_listings")
+      .from(table)
       .upsert(row, { onConflict: "merchant_id,product_name" })
       .select("merchant_id, product_name, updated_at")
       .single();

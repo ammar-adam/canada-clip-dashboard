@@ -3,8 +3,11 @@
 import { TrendingUp, TrendingDown } from "lucide-react";
 import { useMerchant } from "@/contexts/MerchantContext";
 import { merchantData } from "@/lib/merchantData";
+import type { Trigger } from "@/lib/merchantData";
 
-export function ActiveTriggers() {
+export function ActiveTriggers({
+  onTriggerClick,
+}: { onTriggerClick?: (trigger: Trigger) => void } = {}) {
   const merchantId = useMerchant();
   const { triggers } = merchantData[merchantId];
 
@@ -20,7 +23,11 @@ export function ActiveTriggers() {
         {triggers.map((t) => (
           <li
             key={t.query}
-            className="flex items-center justify-between px-4 py-3 transition-colors duration-150 hover:bg-[#ffffff08] hover:border-l hover:border-l-white border-l border-l-transparent"
+            role="button"
+            tabIndex={0}
+            onClick={() => onTriggerClick?.(t)}
+            onKeyDown={(e) => e.key === "Enter" && onTriggerClick?.(t)}
+            className="flex items-center justify-between px-4 py-3 transition-colors duration-150 hover:bg-[#2a2a2a] hover:border-l hover:border-l-white border-l border-l-transparent cursor-pointer"
           >
             <span className="font-mono text-sm text-[var(--accent)]">
               &quot;{t.query}&quot;
@@ -30,14 +37,20 @@ export function ActiveTriggers() {
                 {t.impressions.toLocaleString()} impressions
               </span>
               {t.trend === "up" ? (
-                <TrendingUp className="w-4 h-4 text-[var(--accent)] shrink-0" />
+                <TrendingUp className="w-4 h-4 text-[#22c55e] shrink-0" aria-hidden />
               ) : (
-                <TrendingDown className="w-4 h-4 text-[var(--text-secondary)] shrink-0" />
+                <TrendingDown className="w-4 h-4 text-[#ef4444] shrink-0" aria-hidden />
               )}
             </div>
           </li>
         ))}
       </ul>
+      <button
+        type="button"
+        className="mt-4 w-full rounded-xl border border-dashed border-[var(--border)] bg-transparent py-3 text-sm font-medium text-[var(--text-secondary)] hover:border-[#888] hover:text-[var(--text-primary)] transition-colors duration-150 cursor-pointer"
+      >
+        + Add trigger
+      </button>
     </div>
   );
 }

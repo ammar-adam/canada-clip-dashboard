@@ -30,7 +30,7 @@ export function StolenCustomersChart({
         Customers stolen from big brands
       </h2>
       <p className="text-sm text-[var(--text-secondary)] mt-0.5 font-mono uppercase">
-        Last 7 days
+        Last 4 weeks
       </p>
       <div className="h-[280px] mt-4">
         <ResponsiveContainer width="100%" height="100%">
@@ -49,7 +49,6 @@ export function StolenCustomersChart({
                 fill: "var(--text-secondary)",
                 fontSize: 11,
                 fontFamily: "var(--font-mono), monospace",
-                textTransform: "uppercase",
               }}
               axisLine={{ stroke: "var(--border)" }}
               tickLine={false}

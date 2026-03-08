@@ -17,6 +17,20 @@ create table if not exists public.merchant_listings (
 
 comment on table public.merchant_listings is 'GEO-optimized product descriptions; merchant sites fetch by merchant_id to sync all products. Query: select product_name, description, updated_at from merchant_listings where merchant_id = $1 order by updated_at desc.';
 
+-- GEO analysis runs (suggestions + optimized listing from Gemini)
+create table if not exists public.geo_analyses (
+  id uuid primary key default gen_random_uuid(),
+  created_at timestamptz not null default now(),
+  merchant_id text not null,
+  product_name text not null,
+  original_listing text not null,
+  optimized_listing text not null,
+  suggestions jsonb not null default '[]'::jsonb
+);
+
+create index if not exists geo_analyses_merchant_created on public.geo_analyses (merchant_id, created_at desc);
+comment on table public.geo_analyses is 'GEO runs: Gemini suggestions and optimized listing per product. Dashboard writes here after Analyze.';
+
 -- App Clip events (live activity feed)
 create table if not exists public.clip_events (
   id uuid primary key default gen_random_uuid(),

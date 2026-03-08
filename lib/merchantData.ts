@@ -83,6 +83,11 @@ export type ClipPreview = {
   triggerUrl: string;
 };
 
+export type RevenueByPeriod = { period: string; revenue: number };
+export type RevenueByProvince = { province: string; revenue: number };
+export type RevenueByBrand = { name: string; revenue: number };
+export type ViewsOverTime = { date: string; views: number };
+
 export type MerchantData = {
   business: string;
   province: string;
@@ -96,6 +101,12 @@ export type MerchantData = {
   weeklyStolen: WeeklyDay[];
   clipPreview: ClipPreview;
   website: string;
+  revenueDaily: RevenueByPeriod[];
+  revenueWeekly: RevenueByPeriod[];
+  revenueByProvince: RevenueByProvince[];
+  revenueByBrand: RevenueByBrand[];
+  viewsOverTime: ViewsOverTime[];
+  funnelData: { stage: string; count: number }[];
 };
 
 export const merchantData: Record<MerchantId, MerchantData> = {
@@ -178,13 +189,10 @@ export const merchantData: Record<MerchantId, MerchantData> = {
       { time: "9 min ago", query: "buy Canadian clothing brand", intercepted: "Lululemon.com", action: "Purchased", province: "QC" },
     ],
     weeklyStolen: [
-      { day: "Mon", Jansport: 12, Herschel: 8, "North Face": 6, Others: 2 },
-      { day: "Tue", Jansport: 15, Herschel: 11, "North Face": 7, Others: 2 },
-      { day: "Wed", Jansport: 13, Herschel: 9, "North Face": 7, Others: 2 },
-      { day: "Thu", Jansport: 18, Herschel: 13, "North Face": 8, Others: 3 },
-      { day: "Fri", Jansport: 16, Herschel: 12, "North Face": 7, Others: 3 },
-      { day: "Sat", Jansport: 21, Herschel: 15, "North Face": 11, Others: 4 },
-      { day: "Sun", Jansport: 9, Herschel: 7, "North Face": 4, Others: 2 },
+      { day: "Feb 10", Jansport: 78, Herschel: 56, "North Face": 42, Others: 14 },
+      { day: "Feb 17", Jansport: 85, Herschel: 62, "North Face": 44, Others: 15 },
+      { day: "Feb 24", Jansport: 92, Herschel: 68, "North Face": 46, Others: 16 },
+      { day: "Mar 3", Jansport: 98, Herschel: 74, "North Face": 48, Others: 17 },
     ],
     clipPreview: {
       image: "/clip-backpack.png",
@@ -194,6 +202,32 @@ export const merchantData: Record<MerchantId, MerchantData> = {
       triggerUrl: "https://www.thenorthface.com/en-ca/shop/equipment/backpacks/borealis-backpack",
     },
     website: "https://northbound-backpacks.vercel.app",
+    revenueDaily: [
+      { period: "Mar 1", revenue: 412 }, { period: "Mar 2", revenue: 388 }, { period: "Mar 3", revenue: 521 },
+      { period: "Mar 4", revenue: 445 }, { period: "Mar 5", revenue: 498 }, { period: "Mar 6", revenue: 534 },
+      { period: "Mar 7", revenue: 412 },
+    ],
+    revenueWeekly: [
+      { period: "Feb 10", revenue: 2180 }, { period: "Feb 17", revenue: 2450 }, { period: "Feb 24", revenue: 2720 }, { period: "Mar 3", revenue: 2980 },
+    ],
+    revenueByProvince: [
+      { province: "ON", revenue: 1431 }, { province: "BC", revenue: 1180 }, { province: "AB", revenue: 758 },
+      { province: "QC", revenue: 505 }, { province: "Other", revenue: 336 },
+    ],
+    revenueByBrand: [
+      { name: "Jansport", revenue: 1726 }, { name: "Herschel", revenue: 1179 }, { name: "North Face", revenue: 842 },
+    ],
+    viewsOverTime: (() => {
+      const out: ViewsOverTime[] = [];
+      for (let i = 29; i >= 0; i--) {
+        const d = new Date(); d.setDate(d.getDate() - i);
+        out.push({ date: d.toLocaleDateString("en-CA", { month: "short", day: "numeric" }), views: 52 + Math.floor(Math.random() * 24) + i });
+      }
+      return out;
+    })(),
+    funnelData: [
+      { stage: "Viewed", count: 1832 }, { stage: "Clicked", count: 458 }, { stage: "Purchased", count: 247 },
+    ],
   },
   streetwear: {
     business: "StreetRoot Co",
@@ -267,13 +301,10 @@ export const merchantData: Record<MerchantId, MerchantData> = {
       { time: "7 min ago", query: "quality basics alternative", intercepted: "Carhartt.com", action: "Clicked", province: "AB" },
     ],
     weeklyStolen: [
-      { day: "Mon", Supreme: 14, Stussy: 9, Palace: 5, Others: 3 },
-      { day: "Tue", Supreme: 18, Stussy: 11, Palace: 6, Others: 2 },
-      { day: "Wed", Supreme: 15, Stussy: 10, Palace: 6, Others: 3 },
-      { day: "Thu", Supreme: 21, Stussy: 13, Palace: 7, Others: 4 },
-      { day: "Fri", Supreme: 19, Stussy: 12, Palace: 6, Others: 3 },
-      { day: "Sat", Supreme: 24, Stussy: 15, Palace: 9, Others: 5 },
-      { day: "Sun", Supreme: 12, Stussy: 8, Palace: 4, Others: 2 },
+      { day: "Feb 10", Supreme: 72, Stussy: 48, Palace: 28, Others: 18 },
+      { day: "Feb 17", Supreme: 78, Stussy: 52, Palace: 30, Others: 19 },
+      { day: "Feb 24", Supreme: 84, Stussy: 56, Palace: 32, Others: 20 },
+      { day: "Mar 3", Supreme: 89, Stussy: 60, Palace: 34, Others: 21 },
     ],
     clipPreview: {
       image: "/clip-streetwear.png",
@@ -283,6 +314,30 @@ export const merchantData: Record<MerchantId, MerchantData> = {
       triggerUrl: "https://www.herschel.com/en-ca/shop/classic/urban-hoodie-forest",
     },
     website: "https://streetroot-co.vercel.app",
+    revenueDaily: [
+      { period: "Mar 1", revenue: 312 }, { period: "Mar 2", revenue: 298 }, { period: "Mar 3", revenue: 401 },
+      { period: "Mar 4", revenue: 345 }, { period: "Mar 5", revenue: 378 }, { period: "Mar 6", revenue: 412 }, { period: "Mar 7", revenue: 334 },
+    ],
+    revenueWeekly: [
+      { period: "Feb 10", revenue: 1680 }, { period: "Feb 17", revenue: 1890 }, { period: "Feb 24", revenue: 2100 }, { period: "Mar 3", revenue: 2320 },
+    ],
+    revenueByProvince: [
+      { province: "QC", revenue: 1012 }, { province: "ON", revenue: 954 }, { province: "BC", revenue: 636 }, { province: "AB", revenue: 318 }, { province: "Other", revenue: 260 },
+    ],
+    revenueByBrand: [
+      { name: "Supreme", revenue: 1314 }, { name: "Stussy", revenue: 786 }, { name: "Palace", revenue: 468 },
+    ],
+    viewsOverTime: (() => {
+      const out: ViewsOverTime[] = [];
+      for (let i = 29; i >= 0; i--) {
+        const d = new Date(); d.setDate(d.getDate() - i);
+        out.push({ date: d.toLocaleDateString("en-CA", { month: "short", day: "numeric" }), views: 68 + Math.floor(Math.random() * 20) + i });
+      }
+      return out;
+    })(),
+    funnelData: [
+      { stage: "Viewed", count: 2341 }, { stage: "Clicked", count: 190 }, { stage: "Purchased", count: 189 },
+    ],
   },
   electronics: {
     business: "NorthTech Goods",
@@ -356,13 +411,10 @@ export const merchantData: Record<MerchantId, MerchantData> = {
       { time: "8 min ago", query: "TSA approved power bank", intercepted: "Anker.com", action: "Clicked", province: "BC" },
     ],
     weeklyStolen: [
-      { day: "Mon", Anker: 22, Belkin: 14, Mophie: 7, Others: 4 },
-      { day: "Tue", Anker: 28, Belkin: 17, Mophie: 9, Others: 5 },
-      { day: "Wed", Anker: 25, Belkin: 15, Mophie: 8, Others: 4 },
-      { day: "Thu", Anker: 32, Belkin: 20, Mophie: 11, Others: 6 },
-      { day: "Fri", Anker: 29, Belkin: 18, Mophie: 10, Others: 5 },
-      { day: "Sat", Anker: 38, Belkin: 24, Mophie: 13, Others: 7 },
-      { day: "Sun", Anker: 18, Belkin: 11, Mophie: 6, Others: 3 },
+      { day: "Feb 10", Anker: 128, Belkin: 82, Mophie: 44, Others: 24 },
+      { day: "Feb 17", Anker: 138, Belkin: 88, Mophie: 47, Others: 26 },
+      { day: "Feb 24", Anker: 148, Belkin: 94, Mophie: 50, Others: 28 },
+      { day: "Mar 3", Anker: 158, Belkin: 100, Mophie: 53, Others: 30 },
     ],
     clipPreview: {
       image: "/clip-electronics.png",
@@ -372,6 +424,30 @@ export const merchantData: Record<MerchantId, MerchantData> = {
       triggerUrl: "https://www.anker.com/ca/products/a2664-65w-4-port-charging-station",
     },
     website: "https://northtech-goods.vercel.app",
+    revenueDaily: [
+      { period: "Mar 1", revenue: 892 }, { period: "Mar 2", revenue: 845 }, { period: "Mar 3", revenue: 967 },
+      { period: "Mar 4", revenue: 912 }, { period: "Mar 5", revenue: 934 }, { period: "Mar 6", revenue: 998 }, { period: "Mar 7", revenue: 392 },
+    ],
+    revenueWeekly: [
+      { period: "Feb 10", revenue: 6120 }, { period: "Feb 17", revenue: 6890 }, { period: "Feb 24", revenue: 7580 }, { period: "Mar 3", revenue: 8350 },
+    ],
+    revenueByProvince: [
+      { province: "BC", revenue: 2682 }, { province: "ON", revenue: 2503 }, { province: "AB", revenue: 1612 }, { province: "QC", revenue: 1342 }, { province: "Other", revenue: 801 },
+    ],
+    revenueByBrand: [
+      { name: "Anker", revenue: 3842 }, { name: "Belkin", revenue: 2392 }, { name: "Mophie", revenue: 1264 },
+    ],
+    viewsOverTime: (() => {
+      const out: ViewsOverTime[] = [];
+      for (let i = 29; i >= 0; i--) {
+        const d = new Date(); d.setDate(d.getDate() - i);
+        out.push({ date: d.toLocaleDateString("en-CA", { month: "short", day: "numeric" }), views: 120 + Math.floor(Math.random() * 30) + i * 2 });
+      }
+      return out;
+    })(),
+    funnelData: [
+      { stage: "Viewed", count: 4102 }, { stage: "Clicked", count: 512 }, { stage: "Purchased", count: 312 },
+    ],
   },
   shawarma: {
     business: "Shawarma Palace",
@@ -443,13 +519,10 @@ export const merchantData: Record<MerchantId, MerchantData> = {
       { time: "6 min ago", query: "family pack food", intercepted: "TimHortons.com", action: "Purchased", province: "BC" },
     ],
     weeklyStolen: [
-      { day: "Mon", "McDonald's": 8, Subway: 5, "Tim Hortons": 4, Others: 2 },
-      { day: "Tue", "McDonald's": 10, Subway: 6, "Tim Hortons": 5, Others: 3 },
-      { day: "Wed", "McDonald's": 9, Subway: 6, "Tim Hortons": 4, Others: 2 },
-      { day: "Thu", "McDonald's": 12, Subway: 8, "Tim Hortons": 6, Others: 3 },
-      { day: "Fri", "McDonald's": 11, Subway: 7, "Tim Hortons": 5, Others: 4 },
-      { day: "Sat", "McDonald's": 14, Subway: 9, "Tim Hortons": 7, Others: 4 },
-      { day: "Sun", "McDonald's": 7, Subway: 5, "Tim Hortons": 3, Others: 2 },
+      { day: "Feb 10", "McDonald's": 34, Subway: 22, "Tim Hortons": 18, Others: 12 },
+      { day: "Feb 17", "McDonald's": 36, Subway: 24, "Tim Hortons": 19, Others: 13 },
+      { day: "Feb 24", "McDonald's": 38, Subway: 26, "Tim Hortons": 20, Others: 14 },
+      { day: "Mar 3", "McDonald's": 40, Subway: 28, "Tim Hortons": 21, Others: 15 },
     ],
     clipPreview: {
       image: "/clip-shawarma.png",
@@ -459,6 +532,30 @@ export const merchantData: Record<MerchantId, MerchantData> = {
       triggerUrl: "https://www.ubereats.com/ca/store/shawarma-palace-ottawa",
     },
     website: "https://shawarma-palace.vercel.app",
+    revenueDaily: [
+      { period: "Mar 1", revenue: 198 }, { period: "Mar 2", revenue: 212 }, { period: "Mar 3", revenue: 287 },
+      { period: "Mar 4", revenue: 245 }, { period: "Mar 5", revenue: 268 }, { period: "Mar 6", revenue: 312 }, { period: "Mar 7", revenue: 318 },
+    ],
+    revenueWeekly: [
+      { period: "Feb 10", revenue: 2420 }, { period: "Feb 17", revenue: 2580 }, { period: "Feb 24", revenue: 2710 }, { period: "Mar 3", revenue: 2840 },
+    ],
+    revenueByProvince: [
+      { province: "ON", revenue: 1424 }, { province: "QC", revenue: 682 }, { province: "BC", revenue: 284 }, { province: "AB", revenue: 227 }, { province: "Other", revenue: 223 },
+    ],
+    revenueByBrand: [
+      { name: "McDonald's", revenue: 902 }, { name: "Subway", revenue: 659 }, { name: "Tim Hortons", revenue: 539 },
+    ],
+    viewsOverTime: (() => {
+      const out: ViewsOverTime[] = [];
+      for (let i = 29; i >= 0; i--) {
+        const d = new Date(); d.setDate(d.getDate() - i);
+        out.push({ date: d.toLocaleDateString("en-CA", { month: "short", day: "numeric" }), views: 28 + Math.floor(Math.random() * 12) + Math.floor(i / 3) });
+      }
+      return out;
+    })(),
+    funnelData: [
+      { stage: "Viewed", count: 982 }, { stage: "Clicked", count: 312 }, { stage: "Purchased", count: 156 },
+    ],
   },
 };
 

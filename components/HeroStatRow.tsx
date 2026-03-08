@@ -37,12 +37,12 @@ export function HeroStatRow({
           type="button"
           key={key}
           onClick={() => onStatClick?.(key)}
-          className="rounded-xl border border-[var(--border)] bg-[var(--surface)] p-6 text-left transition-all duration-150 hover:shadow-[0_0_0_1px_rgba(255,255,255,0.12)] focus:outline-none focus:shadow-[0_0_0_1px_rgba(255,255,255,0.12)]"
+          className="rounded-xl border border-[var(--border)] bg-[var(--surface)] p-6 text-left transition-all duration-150 hover:shadow-[0_0_0_1px_rgba(255,255,255,0.12)] hover:border-white/20 focus:outline-none focus:shadow-[0_0_0_1px_rgba(255,255,255,0.12)] cursor-pointer"
         >
-          <span className="text-xs font-semibold uppercase tracking-widest text-[var(--text-secondary)]">
+          <span className="text-xs font-semibold uppercase tracking-widest text-[var(--text-secondary)] block">
             {LABELS[key]}
           </span>
-          <p className="mt-2 text-3xl font-semibold tabular-tight text-[var(--text-primary)] tabular-nums tracking-tight">
+          <p className="mt-2 text-2xl sm:text-3xl font-semibold tabular-nums text-[var(--text-primary)] tracking-tight">
             {values[key]}
           </p>
           <p className="mt-1 text-sm text-[var(--text-secondary)] tabular-tight">

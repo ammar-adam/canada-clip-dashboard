@@ -2,11 +2,11 @@
 
 import { useEffect, useState } from "react";
 
-function scoreColor(score: number) {
-  if (score <= 40) return "var(--text-secondary)";
-  if (score <= 70) return "var(--accent)";
-  return "var(--accent)";
+function currentScoreColor(score: number) {
+  return score < 50 ? "#f59e0b" : "#22c55e";
 }
+
+const PROJECTED_COLOR = "#22c55e";
 
 export function GeoScoreGauge({
   current = 34,
@@ -41,6 +41,8 @@ export function GeoScoreGauge({
     return () => clearInterval(t);
   }, [loaded, current, projected, showProjected]);
 
+  const currentColor = currentScoreColor(displayCurrent);
+
   return (
     <div className="flex gap-10 flex-wrap justify-center items-start">
       <div className="flex flex-col items-center">
@@ -59,7 +61,7 @@ export function GeoScoreGauge({
               cy="50"
               r="42"
               fill="none"
-              stroke={scoreColor(displayCurrent)}
+              stroke={currentColor}
               strokeWidth="8"
               strokeLinecap="round"
               strokeDasharray={`${(displayCurrent / 100) * 264} 264`}
@@ -68,12 +70,12 @@ export function GeoScoreGauge({
           </svg>
           <span
             className="absolute inset-0 flex items-center justify-center text-2xl font-bold tabular-nums tracking-tight"
-            style={{ color: scoreColor(displayCurrent) }}
+            style={{ color: currentColor }}
           >
             {displayCurrent}
           </span>
         </div>
-        <p className="mt-2 text-xs text-[var(--text-secondary)] font-mono uppercase">
+        <p className="mt-2 text-xs font-mono uppercase text-[#aaaaaa]">
           Current GEO Score
         </p>
       </div>
@@ -94,18 +96,19 @@ export function GeoScoreGauge({
                 cy="50"
                 r="42"
                 fill="none"
-                stroke="var(--accent)"
+                stroke={PROJECTED_COLOR}
                 strokeWidth="8"
                 strokeLinecap="round"
                 strokeDasharray={`${(displayProjected / 100) * 264} 264`}
-                className="transition-all duration-100"
+                className="transition-all duration-800 ease-out"
+                style={{ transitionProperty: "stroke-dasharray" }}
               />
             </svg>
-            <span className="absolute inset-0 flex items-center justify-center text-2xl font-bold tabular-nums tracking-tight text-[var(--accent)]">
+            <span className="absolute inset-0 flex items-center justify-center text-2xl font-bold tabular-nums tracking-tight" style={{ color: PROJECTED_COLOR }}>
               {displayProjected}
             </span>
           </div>
-          <p className="mt-2 text-xs text-[var(--text-secondary)] font-mono uppercase">
+          <p className="mt-2 text-xs font-mono uppercase text-[#aaaaaa]">
             Projected
           </p>
         </div>

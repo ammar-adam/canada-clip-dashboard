@@ -1,7 +1,7 @@
 "use client";
 
-import { useState } from "react";
-import { Sparkles, ExternalLink } from "lucide-react";
+import { useState, useEffect } from "react";
+import { Sparkles, ExternalLink, ThumbsUp, RotateCcw, Save } from "lucide-react";
 import { useMerchant } from "@/contexts/MerchantContext";
 import { merchantData } from "@/lib/merchantData";
 import { KeywordsDrivingClicks } from "@/components/KeywordsDrivingClicks";
@@ -15,6 +15,8 @@ const FALLBACK_SUGGESTIONS: GeoSuggestion[] = [
   { issue: "Vague descriptors", why: "Generic terms are not searchable.", fix: "Use specific materials and features.", impact: "Medium" },
   { issue: "No geographic signal", why: "Canadian buyers search for local options.", fix: "Add 'Ships across Canada' early.", impact: "High" },
 ];
+
+const PROJECTED_GEO_SCORE = 78;
 
 export default function GeoPage() {
   const merchantId = useMerchant();
@@ -32,12 +34,78 @@ export default function GeoPage() {
   const [showProjected, setShowProjected] = useState(false);
   const [applying, setApplying] = useState(false);
   const [applySuccess, setApplySuccess] = useState(false);
+  // Rewrite flow (G3)
+  const [showRewritePanel, setShowRewritePanel] = useState(false);
+  const [suggestedRewrite, setSuggestedRewrite] = useState("");
+  const [rewriteAccepted, setRewriteAccepted] = useState(false);
+  const [rewriteLoading, setRewriteLoading] = useState(false);
+  const [savingToSupabase, setSavingToSupabase] = useState(false);
+  const [toast, setToast] = useState<{ message: string; success: boolean } | null>(null);
+
+  useEffect(() => {
+    if (!toast) return;
+    const t = setTimeout(() => setToast(null), 4000);
+    return () => clearTimeout(t);
+  }, [toast]);
 
   const handleProductChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
     const product = e.target.value;
     setSelectedProduct(product);
     setListing(data.productDescriptions[product] ?? "");
   };
+
+  function openRewritePanel() {
+    setSuggestedRewrite(optimizedListing);
+    setShowRewritePanel(true);
+    setRewriteAccepted(false);
+  }
+
+  async function handleTryAgainRewrite() {
+    setRewriteLoading(true);
+    try {
+      const res = await fetch("/api/geo/rewrite", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          listing,
+          issues: suggestions.map((s) => s.issue),
+        }),
+      });
+      const result = await res.json();
+      if (res.ok && typeof result.optimizedListing === "string") {
+        setSuggestedRewrite(result.optimizedListing.trim());
+      }
+    } finally {
+      setRewriteLoading(false);
+    }
+  }
+
+  async function handleSaveToSupabase() {
+    if (!suggestedRewrite) return;
+    setSavingToSupabase(true);
+    setToast(null);
+    try {
+      const res = await fetch("/api/update-listing", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          merchant_id: merchantId,
+          product_name: selectedProduct,
+          description: suggestedRewrite,
+        }),
+      });
+      const result = await res.json();
+      if (res.ok && result.success) {
+        setToast({ message: "Listing updated in Supabase ✓", success: true });
+      } else {
+        setToast({ message: "Save failed — check Supabase connection", success: false });
+      }
+    } catch {
+      setToast({ message: "Save failed — check Supabase connection", success: false });
+    } finally {
+      setSavingToSupabase(false);
+    }
+  }
 
   async function handleAnalyze() {
     setLoading(true);
@@ -46,17 +114,28 @@ export default function GeoPage() {
     setOptimizedListing("");
     setAnalysisDone(false);
     setShowProjected(false);
+    setShowRewritePanel(false);
+    setSuggestedRewrite("");
+    setRewriteAccepted(false);
 
     try {
       const res = await fetch("/api/geo", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ listing }),
+        body: JSON.stringify({
+          listing,
+          merchant_id: merchantId,
+          product_name: selectedProduct,
+        }),
       });
       const result = await res.json();
 
       if (!res.ok) {
-        setError(result.error || "Analysis failed");
+        const msg =
+          result.code === "GEMINI_API_KEY_NOT_SET" || result.message
+            ? result.message || result.error
+            : result.error || "Analysis failed";
+        setError(msg);
         setSuggestions(FALLBACK_SUGGESTIONS);
         setOptimizedListing("");
         setAnalysisDone(true);
@@ -65,6 +144,7 @@ export default function GeoPage() {
 
       setSuggestions(result.suggestions || FALLBACK_SUGGESTIONS);
       setOptimizedListing(typeof result.optimizedListing === "string" ? result.optimizedListing.trim() : "");
+      setError(null);
       setAnalysisDone(true);
       setTimeout(() => setShowProjected(true), 2500);
     } catch (e) {
@@ -110,7 +190,7 @@ export default function GeoPage() {
       </div>
 
       <div className="rounded-xl border border-[var(--border)] bg-[var(--surface)] p-6 transition-shadow duration-150 hover:shadow-[0_0_0_1px_rgba(255,255,255,0.12)]">
-        <label className="block text-xs font-semibold uppercase tracking-widest text-[var(--text-secondary)] mb-2">
+        <label className="block text-xs font-semibold uppercase tracking-widest text-[#aaaaaa] mb-2">
           Select a product to optimize
         </label>
         <select
@@ -129,7 +209,7 @@ export default function GeoPage() {
       <KeywordsDrivingClicks selectedProduct={selectedProduct} />
 
       <div className="rounded-xl border border-[var(--border)] bg-[var(--surface)] p-6 transition-shadow duration-150 hover:shadow-[0_0_0_1px_rgba(255,255,255,0.12)]">
-        <h2 className="text-base font-semibold text-[var(--text-primary)] mb-3">
+        <h2 className="text-base font-semibold text-[#fafafa] mb-3">
           Current listing
         </h2>
         <textarea
@@ -147,17 +227,25 @@ export default function GeoPage() {
           <Sparkles className="w-4 h-4" />
           {loading ? "Analyzing…" : "Analyze with Gemini AI"}
         </button>
+        <p className="mt-2 text-xs text-[var(--text-secondary)] font-mono">
+          Runs Gemini and saves suggestions + optimized listing to Supabase.
+        </p>
         {error && (
-          <p className="mt-3 text-sm text-[var(--text-secondary)] font-mono">
-            {error}
-          </p>
+          <div className="mt-3 p-3 rounded-lg border border-[var(--accent)]/50 bg-[var(--accent)]/10">
+            <p className="text-sm font-semibold text-[var(--accent)] mb-1">
+              {error.includes("API key") || error.includes("GEMINI_API_KEY") ? "API key not working" : "Error"}
+            </p>
+            <p className="text-sm text-[var(--text-secondary)] font-mono">
+              {error}
+            </p>
+          </div>
         )}
       </div>
 
       {analysisDone && (
         <>
           <div className="rounded-xl border border-[var(--border)] bg-[var(--surface)] p-6 transition-shadow duration-150 hover:shadow-[0_0_0_1px_rgba(255,255,255,0.12)]">
-            <h2 className="text-base font-semibold text-[var(--text-primary)] mb-4">
+            <h2 className="text-base font-semibold text-[#fafafa] mb-4">
               GEO Score
             </h2>
             <GeoScoreGauge
@@ -169,11 +257,76 @@ export default function GeoPage() {
           </div>
 
           <div className="rounded-xl border border-[var(--border)] bg-[var(--surface)] p-6 transition-shadow duration-150 hover:shadow-[0_0_0_1px_rgba(255,255,255,0.12)]">
-            <h2 className="text-base font-semibold text-[var(--text-primary)] mb-4">
+            <h2 className="text-base font-semibold text-[#fafafa] mb-4">
               Suggestions
             </h2>
             <GeoSuggestionsPanel suggestions={suggestions} loaded={analysisDone} />
           </div>
+
+          {optimizedListing && (
+            <div className="rounded-xl border border-[var(--border)] bg-[var(--surface)] p-6 transition-shadow duration-150 hover:shadow-[0_0_0_1px_rgba(255,255,255,0.12)]">
+              <button
+                type="button"
+                onClick={openRewritePanel}
+                className="inline-flex items-center gap-2 rounded-lg bg-[var(--accent)] text-[var(--bg)] font-semibold px-4 py-2.5 border border-[var(--border)] transition-colors duration-150 hover:shadow-[0_0_0_1px_rgba(255,255,255,0.12)]"
+              >
+                <Sparkles className="w-4 h-4" />
+                Rewrite with Gemini
+              </button>
+            </div>
+          )}
+
+          {showRewritePanel && suggestedRewrite && (
+            <div className="rounded-xl border border-[var(--border)] bg-[var(--surface)] p-6 transition-shadow duration-150 hover:shadow-[0_0_0_1px_rgba(255,255,255,0.12)]">
+              <h2 className="text-base font-semibold text-[#fafafa] mb-2">
+                Suggested Rewrite
+              </h2>
+              <p className="text-xs text-[#aaaaaa] font-mono mb-3">
+                Projected GEO score: +{PROJECTED_GEO_SCORE}
+              </p>
+              <div className="rounded-lg border border-[var(--border)] bg-black/20 p-4 text-sm text-[var(--text-primary)] leading-relaxed font-mono mb-4 min-h-[100px]">
+                {suggestedRewrite}
+              </div>
+              {!rewriteAccepted ? (
+                <div className="flex flex-wrap gap-3">
+                  <button
+                    type="button"
+                    onClick={() => setRewriteAccepted(true)}
+                    className="inline-flex items-center gap-2 rounded-lg bg-[#22c55e] text-white font-semibold px-4 py-2 border border-[var(--border)] transition-colors duration-150 hover:opacity-90"
+                  >
+                    <ThumbsUp className="w-4 h-4" />
+                    Looks good
+                  </button>
+                  <button
+                    type="button"
+                    onClick={handleTryAgainRewrite}
+                    disabled={rewriteLoading}
+                    className="inline-flex items-center gap-2 rounded-lg bg-white/10 text-[var(--text-primary)] font-semibold px-4 py-2 border border-[var(--border)] disabled:opacity-50 transition-colors duration-150 hover:bg-white/15"
+                  >
+                    <RotateCcw className="w-4 h-4" />
+                    {rewriteLoading ? "Generating…" : "Try again"}
+                  </button>
+                </div>
+              ) : (
+                <div>
+                  <button
+                    type="button"
+                    onClick={handleSaveToSupabase}
+                    disabled={savingToSupabase}
+                    className="inline-flex items-center gap-2 rounded-lg bg-[var(--accent)] text-[var(--bg)] font-semibold px-4 py-2 border border-[var(--border)] disabled:opacity-50 disabled:cursor-not-allowed transition-colors duration-150 hover:shadow-[0_0_0_1px_rgba(255,255,255,0.12)]"
+                  >
+                    <Save className="w-4 h-4" />
+                    {savingToSupabase ? "Saving…" : "Save to Supabase"}
+                  </button>
+                  {toast && (
+                    <p className={`mt-3 text-sm font-mono ${toast.success ? "text-[#22c55e]" : "text-red-400"}`}>
+                      {toast.message}
+                    </p>
+                  )}
+                </div>
+              )}
+            </div>
+          )}
 
           {optimizedListing && (
             <>
@@ -214,6 +367,20 @@ export default function GeoPage() {
             </>
           )}
         </>
+      )}
+
+      {toast && (
+        <div
+          role="status"
+          className="fixed bottom-6 right-6 z-50 px-4 py-3 rounded-lg border shadow-lg font-mono text-sm animate-[fadeIn_0.2s_ease-out]"
+          style={{
+            backgroundColor: "var(--surface)",
+            borderColor: toast.success ? "#22c55e" : "var(--border)",
+            color: toast.success ? "#22c55e" : "#f87171",
+          }}
+        >
+          {toast.message}
+        </div>
       )}
     </div>
   );

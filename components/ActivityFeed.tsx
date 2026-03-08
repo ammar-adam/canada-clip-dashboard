@@ -126,7 +126,7 @@ export function ActivityFeed({
               <tr
                 key={row.id}
                 onClick={() => onRowClick?.(row)}
-                className={`border-b border-[var(--border)]/80 transition-colors duration-150 hover:bg-[#ffffff08] hover:border-l hover:border-l-white cursor-pointer ${
+                className={`border-b border-[var(--border)]/80 transition-colors duration-150 hover:bg-[#2a2a2a] hover:border-l hover:border-l-white cursor-pointer ${
                   i === 0 ? "animate-[fadeIn_0.3s_ease-out_forwards]" : ""
                 }`}
               >
