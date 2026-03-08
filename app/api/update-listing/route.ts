@@ -2,6 +2,14 @@ import { NextRequest, NextResponse } from "next/server";
 import { getSupabaseAdmin } from "@/lib/supabase";
 
 export async function POST(req: NextRequest) {
+  if (!process.env.SUPABASE_SERVICE_ROLE_KEY) {
+    console.error("[update-listing] SUPABASE_SERVICE_ROLE_KEY is not set");
+    return NextResponse.json(
+      { error: "Server misconfiguration" },
+      { status: 500 }
+    );
+  }
+
   const supabaseAdmin = getSupabaseAdmin();
   if (!supabaseAdmin) {
     return NextResponse.json(
@@ -12,6 +20,11 @@ export async function POST(req: NextRequest) {
 
   try {
     const { productId, description } = await req.json();
+
+    console.log("[update-listing] received:", {
+      productId,
+      description: description?.slice(0, 50),
+    });
 
     if (!productId || !description) {
       return NextResponse.json(
@@ -25,14 +38,24 @@ export async function POST(req: NextRequest) {
     const column =
       process.env.SUPABASE_DESCRIPTION_COLUMN ?? "description";
 
-    const { error } = await supabaseAdmin
+    console.log("[update-listing] table:", table, "column:", column);
+
+    // Table schema: merchant_id, product_name, description, updated_at (PK: merchant_id, product_name)
+    const { data, error } = await supabaseAdmin
       .from(table)
-      .update({
-        [column]: description,
-        updated_at: new Date().toISOString(),
-      })
-      .eq("product_id", productId)
-      .eq("merchant_id", "northbound-packs");
+      .upsert(
+        {
+          merchant_id: "northbound-packs",
+          product_name: "City Pack 28L",
+          [column]: description,
+          updated_at: new Date().toISOString(),
+        },
+        { onConflict: "merchant_id,product_name" }
+      )
+      .select();
+
+    console.log("[update-listing] supabase error:", error);
+    console.log("[update-listing] supabase data:", data);
 
     if (error) {
       console.error("Supabase update error:", error);

@@ -1,13 +1,12 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { Sparkles, ExternalLink, ThumbsUp, RotateCcw, Save } from "lucide-react";
+import { Sparkles, ThumbsUp, RotateCcw, Save } from "lucide-react";
 import { useMerchant } from "@/contexts/MerchantContext";
 import { merchantData } from "@/lib/merchantData";
 import { KeywordsDrivingClicks } from "@/components/KeywordsDrivingClicks";
 import { GeoScoreGauge } from "@/components/GeoScoreGauge";
 import { GeoSuggestionsPanel } from "@/components/GeoSuggestionsPanel";
-import { OptimizedListingPreview } from "@/components/OptimizedListingPreview";
 import { DetailPanel, type PanelPayload } from "@/components/DetailPanel";
 import type { GeoSuggestion } from "@/app/api/geo/route";
 
@@ -27,13 +26,9 @@ export default function GeoPage() {
   );
   const [loading, setLoading] = useState(false);
   const [suggestions, setSuggestions] = useState<GeoSuggestion[]>([]);
-  const [optimizedListing, setOptimizedListing] = useState("");
   const [error, setError] = useState<string | null>(null);
   const [analysisDone, setAnalysisDone] = useState(false);
   const [showProjected, setShowProjected] = useState(false);
-  const [applying, setApplying] = useState(false);
-  const [applySuccess, setApplySuccess] = useState(false);
-  // Rewrite flow (G3)
   const [showRewritePanel, setShowRewritePanel] = useState(false);
   const [suggestedRewrite, setSuggestedRewrite] = useState("");
   const [rewriteAccepted, setRewriteAccepted] = useState(false);
@@ -105,7 +100,6 @@ export default function GeoPage() {
     setLoading(true);
     setError(null);
     setSuggestions([]);
-    setOptimizedListing("");
     setAnalysisDone(false);
     setShowProjected(false);
     setShowRewritePanel(false);
@@ -131,13 +125,11 @@ export default function GeoPage() {
             : result.error || "Analysis failed";
         setError(msg);
         setSuggestions(FALLBACK_SUGGESTIONS);
-        setOptimizedListing("");
         setAnalysisDone(true);
         return;
       }
 
       setSuggestions(result.suggestions || FALLBACK_SUGGESTIONS);
-      setOptimizedListing(typeof result.optimizedListing === "string" ? result.optimizedListing.trim() : "");
       setGeoScore(typeof result.geoScore === "number" ? result.geoScore : 34);
       setProjectedScore(typeof result.projectedScore === "number" ? result.projectedScore : 78);
       setError(null);
@@ -146,31 +138,9 @@ export default function GeoPage() {
     } catch (e) {
       setError(e instanceof Error ? e.message : "Request failed");
       setSuggestions(FALLBACK_SUGGESTIONS);
-      setOptimizedListing("");
       setAnalysisDone(true);
     } finally {
       setLoading(false);
-    }
-  }
-
-  async function handleApplyToWebsite() {
-    if (!optimizedListing) return;
-    setApplying(true);
-    setApplySuccess(false);
-    try {
-      const res = await fetch("/api/update-listing", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          productId: "city-pack-28l",
-          description: optimizedListing,
-        }),
-      });
-      const data = await res.json();
-      if (!res.ok) throw new Error(data.error);
-      setApplySuccess(true);
-    } finally {
-      setApplying(false);
     }
   }
 
@@ -280,32 +250,27 @@ export default function GeoPage() {
             <button
               type="button"
               onClick={async () => {
-                if (!optimizedListing && suggestions.length > 0) {
-                  setRewriteLoading(true);
-                  try {
-                    const res = await fetch("/api/geo/rewrite", {
-                      method: "POST",
-                      headers: { "Content-Type": "application/json" },
-                      body: JSON.stringify({ listing, issues: suggestions.map((s) => s.issue) }),
-                    });
-                    const result = await res.json();
-                    if (res.ok && typeof result.optimizedListing === "string") {
-                      setSuggestedRewrite(result.optimizedListing.trim());
-                      setOptimizedListing(result.optimizedListing.trim());
-                    } else {
-                      setSuggestedRewrite(listing + "\n\n[Add price and Canadian signal here.]");
-                    }
-                  } catch {
+                setRewriteLoading(true);
+                setSaveState("idle");
+                try {
+                  const res = await fetch("/api/geo/rewrite", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ listing, issues: suggestions.map((s) => s.issue) }),
+                  });
+                  const result = await res.json();
+                  if (res.ok && typeof result.optimizedListing === "string") {
+                    setSuggestedRewrite(result.optimizedListing.trim());
+                  } else {
                     setSuggestedRewrite(listing + "\n\n[Add price and Canadian signal here.]");
-                  } finally {
-                    setRewriteLoading(false);
                   }
-                } else {
-                  setSuggestedRewrite(optimizedListing || listing);
+                } catch {
+                  setSuggestedRewrite(listing + "\n\n[Add price and Canadian signal here.]");
+                } finally {
+                  setRewriteLoading(false);
                 }
                 setShowRewritePanel(true);
                 setRewriteAccepted(false);
-                setSaveState("idle");
               }}
               disabled={rewriteLoading}
               className="inline-flex items-center gap-2 rounded-lg bg-[var(--brand-red)] text-white font-semibold px-4 py-2.5 border border-[var(--border)] transition-colors duration-150 hover:opacity-90 disabled:opacity-50"
@@ -387,45 +352,6 @@ export default function GeoPage() {
                 </div>
               )}
             </div>
-          )}
-
-          {optimizedListing && (
-            <>
-              <OptimizedListingPreview
-                before={listing}
-                after={optimizedListing}
-                loaded={true}
-              />
-              <div className="rounded-xl border border-[var(--border)] bg-[var(--surface)] p-6 transition-shadow duration-150 hover:shadow-[0_0_0_1px_rgba(255,255,255,0.12)]">
-                <button
-                  onClick={handleApplyToWebsite}
-                  disabled={applying}
-                  className="inline-flex items-center gap-2 rounded-lg bg-[var(--accent)] text-[var(--bg)] font-semibold px-4 py-2 border border-[var(--border)] disabled:opacity-50 disabled:cursor-not-allowed transition-colors duration-150 hover:shadow-[0_0_0_1px_rgba(255,255,255,0.12)]"
-                >
-                  {applying ? (
-                    <>Updating your website…</>
-                  ) : (
-                    <>
-                      <ExternalLink className="w-4 h-4" />
-                      Apply to my website
-                    </>
-                  )}
-                </button>
-                {applySuccess && (
-                  <div className="mt-4 p-3 rounded-lg border border-[var(--accent)]/30 bg-[var(--accent)]/10 text-sm text-[var(--accent)] font-mono">
-                    ✅ Your website has been updated.{" "}
-                    <a
-                      href={data.website}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="underline font-medium"
-                    >
-                      View live on {data.website.replace(/^https?:\/\//, "")} →
-                    </a>
-                  </div>
-                )}
-              </div>
-            </>
           )}
         </>
       )}
