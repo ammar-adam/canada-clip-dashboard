@@ -1,14 +1,7 @@
 "use client";
 
-import { Auth0Provider } from "@auth0/nextjs-auth0/client";
-import type { User } from "@auth0/nextjs-auth0/types";
+import { UserProvider } from "@auth0/nextjs-auth0/client";
 
-export function Auth0Wrapper({
-  user,
-  children,
-}: {
-  user?: User;
-  children: React.ReactNode;
-}) {
-  return <Auth0Provider user={user}>{children}</Auth0Provider>;
+export function Auth0Wrapper({ children }: { children: React.ReactNode }) {
+  return <UserProvider>{children}</UserProvider>;
 }

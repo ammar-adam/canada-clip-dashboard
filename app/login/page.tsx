@@ -1,9 +1,9 @@
 import Image from "next/image";
-import { auth0 } from "@/lib/auth0";
+import { getSession } from "@/lib/auth0";
 import { redirect } from "next/navigation";
 
 export default async function LoginPage() {
-  const session = await auth0.getSession();
+  const session = await getSession();
   if (session?.user) redirect("/dashboard");
 
   return (
@@ -19,7 +19,7 @@ export default async function LoginPage() {
           The GEO platform for Canadian small businesses
         </p>
         <a
-          href="/auth/login"
+          href="/api/auth/login"
           className="bg-[#C8102E] hover:bg-[#0F1E36] text-white rounded-lg px-6 py-3 mt-8 block text-center w-full max-w-xs border border-[#1A2E4A]"
         >
           Sign in to your dashboard

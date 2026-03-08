@@ -1,9 +1,7 @@
-import { auth0 } from "./lib/auth0";
+import { withMiddlewareAuthRequired } from "@auth0/nextjs-auth0/edge";
 
-export async function middleware(request: Request) {
-  return await auth0.middleware(request);
-}
+export default withMiddlewareAuthRequired();
 
 export const config = {
-  matcher: ["/((?!_next/static|_next/image|favicon.ico|sitemap.xml|robots.txt).*)"],
+  matcher: ["/dashboard/:path*"],
 };

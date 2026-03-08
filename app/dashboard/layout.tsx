@@ -1,4 +1,4 @@
-import { auth0 } from "@/lib/auth0";
+import { getSession } from "@/lib/auth0";
 import { getMerchantFromEmail } from "@/lib/merchantData";
 import { MerchantProvider } from "@/contexts/MerchantContext";
 import { Header } from "@/components/Header";
@@ -9,8 +9,8 @@ export default async function DashboardLayout({
 }: {
   children: React.ReactNode;
 }) {
-  const session = await auth0.getSession();
-  if (!session) redirect("/auth/login");
+  const session = await getSession();
+  if (!session) redirect("/api/auth/login");
   const merchantId = getMerchantFromEmail(session.user?.email ?? "");
 
   return (

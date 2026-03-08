@@ -1,12 +1,12 @@
 import Link from "next/link";
 import Image from "next/image";
-import { auth0 } from "@/lib/auth0";
+import { getSession } from "@/lib/auth0";
 import { getMerchantFromEmail } from "@/lib/merchantData";
 import { merchantData } from "@/lib/merchantData";
 import { DashboardNav } from "./DashboardNav";
 
 export async function Header() {
-  const session = await auth0.getSession();
+  const session = await getSession();
   const merchantId = getMerchantFromEmail(session?.user?.email ?? "");
   const merchant = merchantData[merchantId];
 
@@ -26,7 +26,7 @@ export async function Header() {
             Canadian Verified
           </span>
           <a
-            href="/auth/logout"
+            href="/api/auth/logout"
             className="text-xs text-[var(--text-secondary)] hover:text-[var(--text-primary)] border border-[var(--border)] rounded-lg px-3 py-1.5 transition-colors duration-150"
           >
             Sign out
