@@ -14,7 +14,7 @@ import {
   Cell,
 } from "recharts";
 import { useMerchant } from "@/contexts/MerchantContext";
-import { merchantData } from "@/lib/merchantData";
+import { merchantData, getKeywordDrillDown, getTriggerDrillData } from "@/lib/merchantData";
 
 export type PanelType = "stat" | "chart-bar" | "brand" | "table-row" | "trigger" | null;
 
@@ -22,8 +22,9 @@ export type PanelPayload =
   | { type: "stat"; key: string; label: string }
   | { type: "chart-bar"; day: string }
   | { type: "brand"; brandName: string }
-  | { type: "table-row"; row: { time: string; query: string; intercepted: string; action: string; province: string } }
-  | { type: "trigger"; query: string; impressions: number; trend: "up" | "down" }
+  | { type: "table-row"; row: { time: string; query: string; intercepted: string; action: string; province: string; journey?: string } }
+  | { type: "trigger"; query: string; impressions: number; trend: "up" | "down"; isPaused?: boolean; boostRemaining?: number }
+  | { type: "keyword"; word: string; views: number; clicks: number; purchases: number; productKey: string }
   | null;
 
 const DATA_SOURCE_PLACEHOLDER = `// App Clip event schema (clip_events)
@@ -33,14 +34,21 @@ export function DetailPanel({
   open,
   payload,
   onClose,
+  onKeywordBoost,
+  onPauseTrigger,
+  onBoostTrigger,
 }: {
   open: boolean;
   payload: PanelPayload;
   onClose: () => void;
+  onKeywordBoost?: () => void;
+  onPauseTrigger?: (query: string) => void;
+  onBoostTrigger?: (query: string, duration: "24h" | "3d" | "7d") => void;
 }) {
   const merchantId = useMerchant();
   const data = merchantData[merchantId];
   const [revenueGranularity, setRevenueGranularity] = useState<"daily" | "weekly">("daily");
+  const [boostDurationSelecting, setBoostDurationSelecting] = useState(false);
 
   const handleEscape = useCallback(
     (e: KeyboardEvent) => {
@@ -53,6 +61,10 @@ export function DetailPanel({
     if (open) document.addEventListener("keydown", handleEscape);
     return () => document.removeEventListener("keydown", handleEscape);
   }, [open, handleEscape]);
+
+  useEffect(() => {
+    if (!open || payload?.type !== "trigger") setBoostDurationSelecting(false);
+  }, [open, payload?.type]);
 
   if (!open) return null;
 
@@ -67,7 +79,9 @@ export function DetailPanel({
             ? "Session details"
             : payload?.type === "trigger"
               ? `Trigger: ${payload.query}`
-              : "Details";
+              : payload?.type === "keyword"
+                ? `"${payload.word}"`
+                : "Details";
 
   const revenueData = revenueGranularity === "daily" ? data.revenueDaily : data.revenueWeekly;
 
@@ -142,7 +156,7 @@ export function DetailPanel({
                       <XAxis type="number" tick={{ fill: "#888", fontSize: 10 }} axisLine={{ stroke: "var(--border)" }} tickLine={false} tickFormatter={(v) => `$${v}`} />
                       <YAxis type="category" dataKey="name" tick={{ fill: "#aaa", fontSize: 11 }} axisLine={false} tickLine={false} width={72} />
                       <Tooltip contentStyle={{ backgroundColor: "#1a1a1a", border: "1px solid var(--border)", borderRadius: "8px" }} formatter={(v: number) => [`$${v}`, "Revenue"]} />
-                      <Bar dataKey="revenue" fill="#C8102E" radius={[0, 4, 4, 0]} />
+                      <Bar dataKey="revenue" fill="var(--brand-red)" radius={[0, 4, 4, 0]} />
                     </BarChart>
                   </ResponsiveContainer>
                 </div>
@@ -195,12 +209,12 @@ export function DetailPanel({
                 </h3>
                 <div className="h-[220px]">
                   <ResponsiveContainer width="100%" height="100%">
-                    <LineChart data={data.viewsOverTime.map((d) => ({ ...d, taps: Math.round(d.views * 0.25) }))} margin={{ top: 8, right: 8, left: 0, bottom: 0 }}>
+                    <LineChart data={data.tapsTimeSeries ?? data.viewsOverTime.map((d) => ({ date: d.date, value: Math.round(d.views * 0.25) }))} margin={{ top: 8, right: 8, left: 0, bottom: 0 }}>
                       <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.06)" vertical={false} />
                       <XAxis dataKey="date" tick={{ fill: "#888", fontSize: 9 }} axisLine={{ stroke: "var(--border)" }} tickLine={false} />
                       <YAxis tick={{ fill: "#888", fontSize: 10 }} axisLine={false} tickLine={false} />
                       <Tooltip contentStyle={{ backgroundColor: "#1a1a1a", border: "1px solid var(--border)", borderRadius: "8px" }} labelStyle={{ color: "#fafafa" }} />
-                      <Line type="monotone" dataKey="taps" stroke="#a3a3a3" strokeWidth={2} dot={false} />
+                      <Line type="monotone" dataKey="value" stroke="var(--brand-blue-light)" strokeWidth={2} dot={false} />
                     </LineChart>
                   </ResponsiveContainer>
                 </div>
@@ -216,12 +230,12 @@ export function DetailPanel({
                 </h3>
                 <div className="h-[220px]">
                   <ResponsiveContainer width="100%" height="100%">
-                    <LineChart data={data.viewsOverTime} margin={{ top: 8, right: 8, left: 0, bottom: 0 }}>
+                    <LineChart data={data.viewsTimeSeries ?? data.viewsOverTime.map((d) => ({ date: d.date, value: d.views }))} margin={{ top: 8, right: 8, left: 0, bottom: 0 }}>
                       <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.06)" vertical={false} />
                       <XAxis dataKey="date" tick={{ fill: "#888", fontSize: 9 }} axisLine={{ stroke: "var(--border)" }} tickLine={false} />
                       <YAxis tick={{ fill: "#888", fontSize: 10 }} axisLine={false} tickLine={false} />
                       <Tooltip contentStyle={{ backgroundColor: "#1a1a1a", border: "1px solid var(--border)", borderRadius: "8px" }} labelStyle={{ color: "#fafafa" }} />
-                      <Line type="monotone" dataKey="views" stroke="#a3a3a3" strokeWidth={2} dot={false} />
+                      <Line type="monotone" dataKey="value" stroke="var(--brand-red)" strokeWidth={2} dot={false} />
                     </LineChart>
                   </ResponsiveContainer>
                 </div>
@@ -241,7 +255,7 @@ export function DetailPanel({
                       <XAxis type="number" tick={{ fill: "#888", fontSize: 10 }} axisLine={{ stroke: "var(--border)" }} tickLine={false} />
                       <YAxis type="category" dataKey="stage" tick={{ fill: "#aaa", fontSize: 11 }} axisLine={false} tickLine={false} width={72} />
                       <Tooltip contentStyle={{ backgroundColor: "#1a1a1a", border: "1px solid var(--border)", borderRadius: "8px" }} />
-                      <Bar dataKey="count" fill="#22c55e" radius={[0, 4, 4, 0]} />
+                      <Bar dataKey="count" fill="var(--brand-blue)" radius={[0, 4, 4, 0]} />
                     </BarChart>
                   </ResponsiveContainer>
                 </div>
@@ -328,65 +342,158 @@ export function DetailPanel({
                   Device / Trigger URL / Journey
                 </h3>
                 <p className="text-sm text-[#888] font-mono">
-                  iPhone 15 · thenorthface.com/en-ca/shop/equipment/backpacks · Viewed → Clicked → Purchased
+                  iPhone 15 · thenorthface.com/en-ca/shop/equipment/backpacks · {payload.row.journey ?? "Viewed → Clicked → Purchased"}
                 </p>
               </section>
             </>
           )}
 
-          {payload?.type === "trigger" && (
-            <>
-              <section>
-                <h3 className="text-xs font-semibold uppercase tracking-widest text-[#aaaaaa] mb-2">
-                  Impression history (14 days)
-                </h3>
-                <div className="h-[120px]">
-                  <ResponsiveContainer width="100%" height="100%">
-                    <LineChart
-                      data={Array.from({ length: 14 }, (_, i) => ({
-                        day: `D${i + 1}`,
-                        impressions: Math.max(0, Math.round(payload.impressions * (0.6 + 0.4 * (i / 13)) + (payload.trend === "up" ? i * 4 : -i * 2))),
-                      }))}
-                      margin={{ top: 8, right: 8, left: 0, bottom: 0 }}
+          {payload?.type === "keyword" && (() => {
+            const drill = getKeywordDrillDown(merchantId, payload.productKey, payload.word, payload.views);
+            const conversionPct = payload.views ? Math.round((payload.purchases / payload.views) * 1000) / 10 : 0;
+            return (
+              <>
+                <section>
+                  <h3 className="text-xs font-semibold uppercase tracking-widest text-[#aaaaaa] mb-2">
+                    14-day impression sparkline
+                  </h3>
+                  <div className="h-[100px]">
+                    <ResponsiveContainer width="100%" height="100%">
+                      <LineChart data={drill.sparkline} margin={{ top: 8, right: 8, left: 0, bottom: 0 }}>
+                        <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.06)" vertical={false} />
+                        <XAxis dataKey="day" tick={{ fill: "#888", fontSize: 9 }} axisLine={{ stroke: "var(--border)" }} tickLine={false} />
+                        <YAxis tick={{ fill: "#888", fontSize: 10 }} axisLine={false} tickLine={false} />
+                        <Line type="monotone" dataKey="impressions" stroke="var(--brand-blue-light)" strokeWidth={2} dot={false} />
+                      </LineChart>
+                    </ResponsiveContainer>
+                  </div>
+                </section>
+                <section>
+                  <h3 className="text-xs font-semibold uppercase tracking-widest text-[#aaaaaa] mb-2">
+                    Conversion rate (Purchases / Views)
+                  </h3>
+                  <p className="text-sm text-[#fafafa] font-mono tabular-nums">{conversionPct}%</p>
+                </section>
+                <section>
+                  <h3 className="text-xs font-semibold uppercase tracking-widest text-[#aaaaaa] mb-2">
+                    Top 3 provinces
+                  </h3>
+                  <div className="space-y-2">
+                    {drill.topProvinces.map(({ province, pct }) => (
+                      <div key={province} className="flex items-center gap-2">
+                        <span className="w-8 text-[#888] font-mono text-sm">{province}</span>
+                        <div className="flex-1 h-2 rounded-full bg-white/10 overflow-hidden">
+                          <div className="h-full rounded-full bg-[var(--brand-blue)]" style={{ width: `${pct}%` }} />
+                        </div>
+                        <span className="text-[#888] font-mono text-xs tabular-nums w-8">{pct}%</span>
+                      </div>
+                    ))}
+                  </div>
+                </section>
+                <section>
+                  <h3 className="text-xs font-semibold uppercase tracking-widest text-[#aaaaaa] mb-2">
+                    Top device type
+                  </h3>
+                  <p className="text-sm text-[#888] font-mono">{drill.device}</p>
+                </section>
+                <button
+                  type="button"
+                  onClick={() => onKeywordBoost?.()}
+                  className="rounded-lg bg-[var(--brand-blue)] px-4 py-2 text-sm font-medium text-white hover:opacity-90 transition-colors"
+                >
+                  Boost this keyword
+                </button>
+              </>
+            );
+          })()}
+
+          {payload?.type === "trigger" && (() => {
+            const drill = getTriggerDrillData(merchantId, payload.query, payload.impressions, payload.trend);
+            return (
+              <>
+                <section>
+                  <h3 className="text-xs font-semibold uppercase tracking-widest text-[#aaaaaa] mb-2">
+                    Impression history (14 days)
+                  </h3>
+                  <div className="h-[120px]">
+                    <ResponsiveContainer width="100%" height="100%">
+                      <LineChart data={drill.sparkline} margin={{ top: 8, right: 8, left: 0, bottom: 0 }}>
+                        <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.06)" vertical={false} />
+                        <XAxis dataKey="day" tick={{ fill: "#888", fontSize: 9 }} axisLine={{ stroke: "var(--border)" }} tickLine={false} />
+                        <YAxis tick={{ fill: "#888", fontSize: 10 }} axisLine={false} tickLine={false} />
+                        <Tooltip contentStyle={{ backgroundColor: "#1a1a1a", border: "1px solid var(--border)", borderRadius: "8px" }} />
+                        <Line type="monotone" dataKey="impressions" stroke="var(--brand-blue-light)" strokeWidth={2} dot={false} />
+                      </LineChart>
+                    </ResponsiveContainer>
+                  </div>
+                </section>
+                <section>
+                  <h3 className="text-xs font-semibold uppercase tracking-widest text-[#aaaaaa] mb-2">
+                    Conversion rate (this query)
+                  </h3>
+                  <p className="text-sm text-[#fafafa] font-mono tabular-nums">
+                    ~{Math.round(8000 / Math.max(1, payload.impressions)) / 100}% (view → tap → purchase)
+                  </p>
+                </section>
+                <section>
+                  <h3 className="text-xs font-semibold uppercase tracking-widest text-[#aaaaaa] mb-2">
+                    Top provinces / devices
+                  </h3>
+                  <p className="text-sm text-[#888] font-mono">
+                    {drill.topProvinces.map((p) => `${p.province} ${p.pct}%`).join(" · ")}
+                  </p>
+                  <p className="text-xs text-[#888] font-mono mt-1">
+                    iPhone 62% · Android 28% · Other 10%
+                  </p>
+                </section>
+                <section className="flex flex-wrap gap-3 items-center">
+                <button
+                  type="button"
+                  onClick={() => payload.isPaused ? onPauseTrigger?.(payload.query) : onPauseTrigger?.(payload.query)}
+                  className="rounded-lg border border-[var(--border)] bg-white/5 px-4 py-2 text-sm font-medium text-[#fafafa] hover:bg-white/10 transition-colors"
+                >
+                  {payload.isPaused ? "Resume trigger" : "Pause trigger"}
+                </button>
+                {typeof payload.boostRemaining === "number" && payload.boostRemaining > 0 ? (
+                  <span className="rounded-lg bg-[var(--brand-blue-muted)] border border-[var(--brand-blue)] px-4 py-2 text-sm font-medium text-[var(--brand-blue)]">
+                    Boosting ({payload.boostRemaining}d remaining)
+                  </span>
+                ) : boostDurationSelecting ? (
+                  <div className="flex gap-2">
+                    {(["24h", "3d", "7d"] as const).map((d) => (
+                      <button
+                        key={d}
+                        type="button"
+                        onClick={() => {
+                          onBoostTrigger?.(payload.query, d);
+                          setBoostDurationSelecting(false);
+                        }}
+                        className="rounded-lg bg-[var(--brand-blue)] px-3 py-2 text-sm font-medium text-white hover:opacity-90 transition-colors"
+                      >
+                        {d === "24h" ? "24 hours" : d === "3d" ? "3 days" : "7 days"}
+                      </button>
+                    ))}
+                    <button
+                      type="button"
+                      onClick={() => setBoostDurationSelecting(false)}
+                      className="rounded-lg border border-[var(--border)] px-3 py-2 text-sm text-[#888] hover:bg-white/5"
                     >
-                      <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.06)" vertical={false} />
-                      <XAxis dataKey="day" tick={{ fill: "#888", fontSize: 9 }} axisLine={{ stroke: "var(--border)" }} tickLine={false} />
-                      <YAxis tick={{ fill: "#888", fontSize: 10 }} axisLine={false} tickLine={false} />
-                      <Tooltip contentStyle={{ backgroundColor: "#1a1a1a", border: "1px solid var(--border)", borderRadius: "8px" }} />
-                      <Line type="monotone" dataKey="impressions" stroke="var(--accent)" strokeWidth={2} dot={false} />
-                    </LineChart>
-                  </ResponsiveContainer>
-                </div>
+                      Cancel
+                    </button>
+                  </div>
+                ) : (
+                  <button
+                    type="button"
+                    onClick={() => setBoostDurationSelecting(true)}
+                    className="rounded-lg bg-[var(--brand-blue)] px-4 py-2 text-sm font-medium text-white hover:opacity-90 transition-colors"
+                  >
+                    Boost trigger
+                  </button>
+                )}
               </section>
-              <section>
-                <h3 className="text-xs font-semibold uppercase tracking-widest text-[#aaaaaa] mb-2">
-                  Conversion rate (this query)
-                </h3>
-                <p className="text-sm text-[#fafafa] font-mono tabular-nums">
-                  ~{Math.round(8000 / Math.max(1, payload.impressions)) / 100}% (view → tap → purchase)
-                </p>
-              </section>
-              <section>
-                <h3 className="text-xs font-semibold uppercase tracking-widest text-[#aaaaaa] mb-2">
-                  Top provinces / devices
-                </h3>
-                <p className="text-sm text-[#888] font-mono">
-                  ON 38% · BC 24% · AB 18% · QC 12% · Other 8%
-                </p>
-                <p className="text-xs text-[#888] font-mono mt-1">
-                  iPhone 62% · Android 28% · Other 10%
-                </p>
-              </section>
-              <section className="flex gap-3">
-                <button type="button" className="rounded-lg border border-[var(--border)] bg-white/5 px-4 py-2 text-sm font-medium text-[#fafafa] hover:bg-white/10 transition-colors">
-                  Pause trigger
-                </button>
-                <button type="button" className="rounded-lg bg-[#22c55e] px-4 py-2 text-sm font-medium text-white hover:opacity-90 transition-colors">
-                  Boost trigger
-                </button>
-              </section>
-            </>
-          )}
+              </>
+            );
+          })()}
 
           {payload?.type === "stat" && !["revenue", "stolen", "views", "conversionRate", "taps", "purchases"].includes(payload.key) && (
             <>

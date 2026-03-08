@@ -62,11 +62,21 @@ export type KeywordMetric = {
 
 export type Trigger = { query: string; impressions: number; trend: "up" | "down" };
 
+/** Derives the canonical ACTION from a journey string (terminal step). Use this so table row and session panel stay in sync. */
+export function deriveActionFromJourney(journey: string): "Viewed" | "Clicked" | "Purchased" {
+  const steps = journey.split("→").map((s) => s.trim()).filter(Boolean);
+  const last = steps[steps.length - 1]?.toLowerCase();
+  if (last === "purchased") return "Purchased";
+  if (last === "clicked") return "Clicked";
+  return "Viewed";
+}
+
 export type ActivityRow = {
   time: string;
   query: string;
   intercepted: string;
-  action: "Viewed" | "Clicked" | "Purchased";
+  /** Journey string e.g. "Viewed → Clicked → Purchased". ACTION must always match the terminal step — use deriveActionFromJourney(). Do not set action manually in mock data. */
+  journey: string;
   province: string;
 };
 
@@ -88,6 +98,15 @@ export type RevenueByProvince = { province: string; revenue: number };
 export type RevenueByBrand = { name: string; revenue: number };
 export type ViewsOverTime = { date: string; views: number };
 
+/** Per-trigger 14-day sparkline and top provinces (unique data per trigger). */
+export type TriggerDrillData = {
+  sparkline: { day: string; impressions: number }[];
+  topProvinces: { province: string; pct: number }[];
+};
+
+/** Per-stat time series for drill-downs (Views = smooth up, Taps = volatile, Purchases = step/weekends, Revenue = scaled purchases). */
+export type StatTimeSeries = { date: string; value: number }[];
+
 export type MerchantData = {
   business: string;
   province: string;
@@ -107,6 +126,13 @@ export type MerchantData = {
   revenueByBrand: RevenueByBrand[];
   viewsOverTime: ViewsOverTime[];
   funnelData: { stage: string; count: number }[];
+  /** Unique per-trigger sparkline + provinces. Key = trigger query. */
+  triggerDrill?: Record<string, TriggerDrillData>;
+  /** Unique per-stat time series for drill-down panels. */
+  viewsTimeSeries?: StatTimeSeries;
+  tapsTimeSeries?: StatTimeSeries;
+  purchasesTimeSeries?: StatTimeSeries;
+  revenueTimeSeries?: StatTimeSeries;
 };
 
 export const merchantData: Record<MerchantId, MerchantData> = {
@@ -115,12 +141,12 @@ export const merchantData: Record<MerchantId, MerchantData> = {
     province: "Ontario",
     stats: { stolen: 247, views: 1832, conversionRate: 13.4, revenue: 4210 },
     competitors: [
-      { name: "Jansport", count: 104, color: "#C8102E" },
-      { name: "Herschel", count: 75, color: "#0EA472" },
-      { name: "North Face", count: 50, color: "#1E6FD4" },
-      { name: "REI", count: 28, color: "#D4930A" },
-      { name: "MEC", count: 19, color: "#8B5CF6" },
-      { name: "Others", count: 11, color: "#2E4A6B" },
+      { name: "Jansport", count: 104, color: "#003087" },
+      { name: "Herschel", count: 75, color: "#1a5cb8" },
+      { name: "North Face", count: 50, color: "#C8102E" },
+      { name: "REI", count: 28, color: "#555555" },
+      { name: "MEC", count: 19, color: "#555555" },
+      { name: "Others", count: 11, color: "#555555" },
     ],
     products: [
       "City Pack 28L ($179)",
@@ -176,17 +202,18 @@ export const merchantData: Record<MerchantId, MerchantData> = {
       { query: "waterproof daypack", impressions: 134, trend: "up" },
       { query: "handmade bag Canada", impressions: 98, trend: "up" },
     ],
+    // ACTION must always match the terminal step of journey. Use deriveActionFromJourney() — do not set action manually.
     activityFeed: [
-      { time: "just now", query: "backpack under $200", intercepted: "Jansport.com", action: "Purchased", province: "ON" },
-      { time: "1 min ago", query: "best hiking boots Canada", intercepted: "MEC.ca", action: "Clicked", province: "BC" },
-      { time: "2 min ago", query: "Canadian made wallet", intercepted: "Herschel.com", action: "Viewed", province: "QC" },
-      { time: "3 min ago", query: "waterproof jacket alternative", intercepted: "NorthFace.com", action: "Purchased", province: "AB" },
-      { time: "4 min ago", query: "affordable travel bag", intercepted: "Samsonite.com", action: "Clicked", province: "ON" },
-      { time: "5 min ago", query: "handmade leather goods", intercepted: "Roots.com", action: "Viewed", province: "MB" },
-      { time: "6 min ago", query: "Canadian outdoor gear", intercepted: "REI.com", action: "Purchased", province: "BC" },
-      { time: "7 min ago", query: "tote bag under $100", intercepted: "Herschel.com", action: "Clicked", province: "NS" },
-      { time: "8 min ago", query: "durable school backpack", intercepted: "Jansport.com", action: "Viewed", province: "ON" },
-      { time: "9 min ago", query: "buy Canadian clothing brand", intercepted: "Lululemon.com", action: "Purchased", province: "QC" },
+      { time: "just now", query: "backpack under $200", intercepted: "Jansport.com", journey: "Viewed → Clicked → Purchased", province: "ON" },
+      { time: "1 min ago", query: "best hiking boots Canada", intercepted: "MEC.ca", journey: "Viewed → Clicked", province: "BC" },
+      { time: "2 min ago", query: "Canadian made wallet", intercepted: "Herschel.com", journey: "Viewed", province: "QC" },
+      { time: "3 min ago", query: "waterproof jacket alternative", intercepted: "NorthFace.com", journey: "Viewed → Clicked → Purchased", province: "AB" },
+      { time: "4 min ago", query: "affordable travel bag", intercepted: "Samsonite.com", journey: "Viewed → Clicked", province: "ON" },
+      { time: "5 min ago", query: "handmade leather goods", intercepted: "Roots.com", journey: "Viewed", province: "MB" },
+      { time: "6 min ago", query: "Canadian outdoor gear", intercepted: "REI.com", journey: "Viewed → Clicked → Purchased", province: "BC" },
+      { time: "7 min ago", query: "tote bag under $100", intercepted: "Herschel.com", journey: "Viewed → Clicked", province: "NS" },
+      { time: "8 min ago", query: "durable school backpack", intercepted: "Jansport.com", journey: "Viewed", province: "ON" },
+      { time: "9 min ago", query: "buy Canadian clothing brand", intercepted: "Lululemon.com", journey: "Viewed → Clicked → Purchased", province: "QC" },
     ],
     weeklyStolen: [
       { day: "Feb 10", Jansport: 78, Herschel: 56, "North Face": 42, Others: 14 },
@@ -195,7 +222,7 @@ export const merchantData: Record<MerchantId, MerchantData> = {
       { day: "Mar 3", Jansport: 98, Herschel: 74, "North Face": 48, Others: 17 },
     ],
     clipPreview: {
-      image: "/clip-backpack.png",
+      image: "https://images.unsplash.com/photo-1553062407-98eeb64c6a62?w=400",
       productName: "City Pack 28L",
       price: "$129.00",
       sourceDomain: "thenorthface.com",
@@ -228,6 +255,36 @@ export const merchantData: Record<MerchantId, MerchantData> = {
     funnelData: [
       { stage: "Viewed", count: 1832 }, { stage: "Clicked", count: 458 }, { stage: "Purchased", count: 247 },
     ],
+    triggerDrill: {
+      "backpack under $200": {
+        sparkline: Array.from({ length: 14 }, (_, i) => ({ day: `D${i + 1}`, impressions: 60 + Math.round(40 * (i / 13)) + (i % 2) * 5 })),
+        topProvinces: [{ province: "ON", pct: 45 }, { province: "BC", pct: 25 }, { province: "AB", pct: 18 }, { province: "QC", pct: 12 }],
+      },
+      "Canadian made backpack": {
+        sparkline: Array.from({ length: 14 }, (_, i) => ({ day: `D${i + 1}`, impressions: 20 + Math.round(20 * (i / 13)) + (i % 3) })),
+        topProvinces: [{ province: "QC", pct: 38 }, { province: "ON", pct: 32 }, { province: "BC", pct: 20 }, { province: "MB", pct: 10 }],
+      },
+      "hiking pack Canada": {
+        sparkline: Array.from({ length: 14 }, (_, i) => ({ day: `D${i + 1}`, impressions: 15 + Math.round(15 * (i / 13)) + i })),
+        topProvinces: [{ province: "BC", pct: 52 }, { province: "AB", pct: 28 }, { province: "ON", pct: 15 }, { province: "SK", pct: 5 }],
+      },
+      "Jansport alternative": {
+        sparkline: Array.from({ length: 14 }, (_, i) => ({ day: `D${i + 1}`, impressions: 20 - Math.round(10 * (i / 13)) + (i % 2) })),
+        topProvinces: [{ province: "ON", pct: 55 }, { province: "BC", pct: 22 }, { province: "AB", pct: 13 }, { province: "NS", pct: 10 }],
+      },
+      "waterproof daypack": {
+        sparkline: Array.from({ length: 14 }, (_, i) => ({ day: `D${i + 1}`, impressions: 5 + (i % 4) * 8 + (i % 3) * 5 })),
+        topProvinces: [{ province: "BC", pct: 48 }, { province: "ON", pct: 30 }, { province: "AB", pct: 15 }, { province: "NL", pct: 7 }],
+      },
+      "handmade bag Canada": {
+        sparkline: Array.from({ length: 14 }, (_, i) => ({ day: `D${i + 1}`, impressions: 5 + (i % 2) * 5 + Math.floor(i / 4) })),
+        topProvinces: [{ province: "QC", pct: 42 }, { province: "ON", pct: 35 }, { province: "BC", pct: 15 }, { province: "NB", pct: 8 }],
+      },
+    },
+    viewsTimeSeries: Array.from({ length: 30 }, (_, i) => ({ date: `Day ${i + 1}`, value: 40 + i * 3 + Math.sin(i * 0.3) * 5 })),
+    tapsTimeSeries: Array.from({ length: 30 }, (_, i) => ({ date: `Day ${i + 1}`, value: 10 + (i % 5) * 4 + (i % 3) * 3 })),
+    purchasesTimeSeries: Array.from({ length: 30 }, (_, i) => ({ date: `Day ${i + 1}`, value: (i % 7 >= 5 ? 12 : 6) + (i % 4) })),
+    revenueTimeSeries: Array.from({ length: 30 }, (_, i) => ({ date: `Day ${i + 1}`, value: ((i % 7 >= 5 ? 12 : 6) + (i % 4)) * 18 })),
   },
   streetwear: {
     business: "StreetRoot Co",
@@ -293,12 +350,13 @@ export const merchantData: Record<MerchantId, MerchantData> = {
       { query: "oversized tee Montreal", impressions: 198, trend: "up" },
       { query: "quality basics Canada", impressions: 134, trend: "down" },
     ],
+    // ACTION must always match the terminal step of journey. Use deriveActionFromJourney() — do not set action manually.
     activityFeed: [
-      { time: "just now", query: "heavyweight tee under $80", intercepted: "Supreme.com", action: "Purchased", province: "QC" },
-      { time: "2 min ago", query: "Canadian streetwear", intercepted: "Stussy.com", action: "Clicked", province: "ON" },
-      { time: "3 min ago", query: "oversized graphic tee", intercepted: "Nike.com", action: "Viewed", province: "BC" },
-      { time: "5 min ago", query: "Montreal clothing brand", intercepted: "Reigning Champ.com", action: "Purchased", province: "QC" },
-      { time: "7 min ago", query: "quality basics alternative", intercepted: "Carhartt.com", action: "Clicked", province: "AB" },
+      { time: "just now", query: "heavyweight tee under $80", intercepted: "Supreme.com", journey: "Viewed → Clicked → Purchased", province: "QC" },
+      { time: "2 min ago", query: "Canadian streetwear", intercepted: "Stussy.com", journey: "Viewed → Clicked", province: "ON" },
+      { time: "3 min ago", query: "oversized graphic tee", intercepted: "Nike.com", journey: "Viewed", province: "BC" },
+      { time: "5 min ago", query: "Montreal clothing brand", intercepted: "Reigning Champ.com", journey: "Viewed → Clicked → Purchased", province: "QC" },
+      { time: "7 min ago", query: "quality basics alternative", intercepted: "Carhartt.com", journey: "Viewed → Clicked", province: "AB" },
     ],
     weeklyStolen: [
       { day: "Feb 10", Supreme: 72, Stussy: 48, Palace: 28, Others: 18 },
@@ -403,12 +461,13 @@ export const merchantData: Record<MerchantId, MerchantData> = {
       { query: "travel power bank TSA", impressions: 287, trend: "up" },
       { query: "USB-C power bank", impressions: 198, trend: "down" },
     ],
+    // ACTION must always match the terminal step of journey. Use deriveActionFromJourney() — do not set action manually.
     activityFeed: [
-      { time: "just now", query: "best power bank 2024", intercepted: "Anker.com", action: "Purchased", province: "BC" },
-      { time: "1 min ago", query: "GaN charger Canada", intercepted: "Belkin.com", action: "Clicked", province: "ON" },
-      { time: "3 min ago", query: "20000mAh portable charger", intercepted: "Mophie.com", action: "Viewed", province: "AB" },
-      { time: "5 min ago", query: "Canadian electronics brand", intercepted: "Samsung.com", action: "Purchased", province: "QC" },
-      { time: "8 min ago", query: "TSA approved power bank", intercepted: "Anker.com", action: "Clicked", province: "BC" },
+      { time: "just now", query: "best power bank 2024", intercepted: "Anker.com", journey: "Viewed → Clicked → Purchased", province: "BC" },
+      { time: "1 min ago", query: "GaN charger Canada", intercepted: "Belkin.com", journey: "Viewed → Clicked", province: "ON" },
+      { time: "3 min ago", query: "20000mAh portable charger", intercepted: "Mophie.com", journey: "Viewed", province: "AB" },
+      { time: "5 min ago", query: "Canadian electronics brand", intercepted: "Samsung.com", journey: "Viewed → Clicked → Purchased", province: "QC" },
+      { time: "8 min ago", query: "TSA approved power bank", intercepted: "Anker.com", journey: "Viewed → Clicked", province: "BC" },
     ],
     weeklyStolen: [
       { day: "Feb 10", Anker: 128, Belkin: 82, Mophie: 44, Others: 24 },
@@ -512,11 +571,12 @@ export const merchantData: Record<MerchantId, MerchantData> = {
       { query: "best shawarma Ontario", impressions: 198, trend: "up" },
       { query: "McDonald's alternative", impressions: 134, trend: "down" },
     ],
+    // ACTION must always match the terminal step of journey. Use deriveActionFromJourney() — do not set action manually.
     activityFeed: [
-      { time: "just now", query: "shawarma plate delivery", intercepted: "McDonalds.com", action: "Purchased", province: "ON" },
-      { time: "2 min ago", query: "halal restaurant", intercepted: "Subway.com", action: "Clicked", province: "QC" },
-      { time: "4 min ago", query: "best garlic sauce", intercepted: "PitaPit.com", action: "Viewed", province: "ON" },
-      { time: "6 min ago", query: "family pack food", intercepted: "TimHortons.com", action: "Purchased", province: "BC" },
+      { time: "just now", query: "shawarma plate delivery", intercepted: "McDonalds.com", journey: "Viewed → Clicked → Purchased", province: "ON" },
+      { time: "2 min ago", query: "halal restaurant", intercepted: "Subway.com", journey: "Viewed → Clicked", province: "QC" },
+      { time: "4 min ago", query: "best garlic sauce", intercepted: "PitaPit.com", journey: "Viewed", province: "ON" },
+      { time: "6 min ago", query: "family pack food", intercepted: "TimHortons.com", journey: "Viewed → Clicked → Purchased", province: "BC" },
     ],
     weeklyStolen: [
       { day: "Feb 10", "McDonald's": 34, Subway: 22, "Tim Hortons": 18, Others: 12 },
@@ -573,4 +633,60 @@ export function getMerchantFromEmail(email: string): MerchantId {
   if (email === "electronics@canadaclip.ca") return "electronics";
   if (email === "shawarma@canadaclip.ca") return "shawarma";
   return "backpack";
+}
+
+export type KeywordDrillDown = {
+  sparkline: { day: string; impressions: number }[];
+  topProvinces: { province: string; pct: number }[];
+  device: string;
+};
+
+/** Returns per-trigger drill data (sparkline + provinces) or generates from impressions/trend. */
+export function getTriggerDrillData(
+  merchantId: MerchantId,
+  query: string,
+  impressions: number,
+  trend: "up" | "down"
+): TriggerDrillData {
+  const data = merchantData[merchantId];
+  const stored = data.triggerDrill?.[query];
+  if (stored) return stored;
+  return {
+    sparkline: Array.from({ length: 14 }, (_, i) => ({
+      day: `D${i + 1}`,
+      impressions: Math.max(0, Math.round(impressions * (0.6 + 0.4 * (i / 13)) + (trend === "up" ? i * 4 : -i * 2))),
+    })),
+    topProvinces: [
+      { province: "ON", pct: 38 },
+      { province: "BC", pct: 24 },
+      { province: "AB", pct: 18 },
+    ],
+  };
+}
+
+/** Mock 14-day impression sparkline and top provinces for a keyword drill-down. */
+export function getKeywordDrillDown(
+  _merchantId: MerchantId,
+  _productKey: string,
+  word: string,
+  views: number
+): KeywordDrillDown {
+  const seed = word.split("").reduce((a, c) => a + c.charCodeAt(0), 0);
+  const sparkline = Array.from({ length: 14 }, (_, i) => ({
+    day: `D${i + 1}`,
+    impressions: Math.max(0, Math.round((views / 14) * (0.7 + 0.3 * (i / 13)) + (seed % 5) * (i % 3 - 1))),
+  }));
+  const provinceSeeds: [string, number][] = [
+    ["ON", (seed + 1) % 100],
+    ["BC", (seed + 2) % 100],
+    ["QC", (seed + 3) % 100],
+    ["AB", (seed + 4) % 100],
+  ];
+  const total = provinceSeeds.reduce((s, [, p]) => s + p, 0);
+  const topProvinces = provinceSeeds.slice(0, 3).map(([province, p]) => ({
+    province,
+    pct: Math.round((p / total) * 100),
+  }));
+  const device = seed % 3 === 0 ? "iPhone 68% · Android 26% · Desktop 6%" : seed % 3 === 1 ? "iPhone 62% · Android 30% · Desktop 8%" : "iPhone 72% · Android 22% · Desktop 6%";
+  return { sparkline, topProvinces, device };
 }

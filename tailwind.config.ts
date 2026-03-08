@@ -9,6 +9,10 @@ const config: Config = {
   theme: {
     extend: {
       colors: {
+        "brand-red": "var(--brand-red)",
+        "brand-blue": "var(--brand-blue)",
+        "brand-red-light": "var(--brand-red-light)",
+        "brand-blue-light": "var(--brand-blue-light)",
         base: "#050C1A",
         card: "#0B1628",
         "card-hover": "#0F1E36",
@@ -20,9 +24,6 @@ const config: Config = {
         "red-primary": "#C8102E",
         "red-hover": "#E8132F",
         "red-subtle": "#1A0810",
-        green: "#0EA472",
-        "green-subtle": "#051A12",
-        yellow: "#D4930A",
         "blue-accent": "#1E6FD4",
       },
       fontFamily: {

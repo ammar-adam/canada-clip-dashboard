@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useMemo, useRef } from "react";
 import { useMerchant } from "@/contexts/MerchantContext";
-import { merchantData } from "@/lib/merchantData";
+import { merchantData, deriveActionFromJourney } from "@/lib/merchantData";
 import { createBrowserClient, type ClipEvent } from "@/lib/supabase";
 
 type Row = {
@@ -12,6 +12,7 @@ type Row = {
   intercepted: string;
   action: "Viewed" | "Clicked" | "Purchased";
   province: string;
+  journey?: string;
 };
 
 function shuffle<T>(arr: T[]): T[] {
@@ -39,10 +40,14 @@ export function ActivityFeed({
   onRowClick?: (row: Row) => void;
 } = {}) {
   const merchantId = useMerchant();
-  const pool = useMemo(
-    () => shuffle([...merchantData[merchantId].activityFeed]),
-    [merchantId]
-  );
+  const pool = useMemo(() => {
+    const feed = merchantData[merchantId].activityFeed;
+    return shuffle([...feed]).map((r) => ({
+      ...r,
+      action: deriveActionFromJourney(r.journey),
+      journey: r.journey,
+    }));
+  }, [merchantId]);
   const [rows, setRows] = useState<Row[]>(() =>
     pool.slice(0, 8).map((r, i) => ({ ...r, id: `init-${i}` }))
   );
@@ -54,7 +59,7 @@ export function ActivityFeed({
     const interval = setInterval(() => {
       const next = pool[nextIndex % pool.length];
       setRows((prev) => [
-        { ...next, id: `live-${Date.now()}` },
+        { ...next, id: `live-${Date.now()}`, action: next.action, journey: next.journey } as Row,
         ...prev.slice(0, 9),
       ]);
       setNextIndex((i) => i + 1);
@@ -73,6 +78,12 @@ export function ActivityFeed({
         (payload) => {
           const e = payload.new as ClipEvent & { merchant_id?: string };
           if (e.merchant_id !== merchantId) return;
+          const journey =
+            e.action === "Purchased"
+              ? "Viewed → Clicked → Purchased"
+              : e.action === "Clicked"
+                ? "Viewed → Clicked"
+                : "Viewed";
           setRows((prev) => [
             {
               id: e.id,
@@ -81,6 +92,7 @@ export function ActivityFeed({
               intercepted: e.intercepted,
               action: e.action,
               province: e.province,
+              journey,
             },
             ...prev.slice(0, 9),
           ]);
@@ -94,9 +106,9 @@ export function ActivityFeed({
   }, [merchantId]);
 
   const actionClass = (action: Row["action"]) => {
-    if (action === "Purchased") return "text-white/90";
-    if (action === "Clicked") return "text-[var(--accent)]";
-    return "text-[var(--text-secondary)]";
+    if (action === "Purchased") return "text-[var(--brand-red)]";
+    if (action === "Clicked") return "text-[var(--brand-blue-light)]";
+    return "text-[#888]";
   };
 
   return (
@@ -133,7 +145,7 @@ export function ActivityFeed({
                 <td className="py-3 text-[var(--text-secondary)] tabular-tight">
                   {row.time}
                 </td>
-                <td className="py-3 font-mono text-[var(--accent)] text-xs">
+                <td className="py-3 font-mono text-[var(--brand-blue-light)] text-xs">
                   &quot;{row.query}&quot;
                 </td>
                 <td className="py-3 text-[var(--text-secondary)]">

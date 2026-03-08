@@ -47,7 +47,7 @@ export function ClipPerformance({
                 ? `$${values[m.key].toLocaleString()}`
                 : values[m.key].toLocaleString()}
             </p>
-            <p className="mt-1 text-xs text-[#22c55e] font-mono tabular-nums">
+            <p className="mt-1 text-xs text-[var(--brand-blue)] font-mono tabular-nums">
               {m.delta}
             </p>
           </button>

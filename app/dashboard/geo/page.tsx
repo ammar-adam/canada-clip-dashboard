@@ -8,6 +8,7 @@ import { KeywordsDrivingClicks } from "@/components/KeywordsDrivingClicks";
 import { GeoScoreGauge } from "@/components/GeoScoreGauge";
 import { GeoSuggestionsPanel } from "@/components/GeoSuggestionsPanel";
 import { OptimizedListingPreview } from "@/components/OptimizedListingPreview";
+import { DetailPanel, type PanelPayload } from "@/components/DetailPanel";
 import type { GeoSuggestion } from "@/app/api/geo/route";
 
 const FALLBACK_SUGGESTIONS: GeoSuggestion[] = [
@@ -15,8 +16,6 @@ const FALLBACK_SUGGESTIONS: GeoSuggestion[] = [
   { issue: "Vague descriptors", why: "Generic terms are not searchable.", fix: "Use specific materials and features.", impact: "Medium" },
   { issue: "No geographic signal", why: "Canadian buyers search for local options.", fix: "Add 'Ships across Canada' early.", impact: "High" },
 ];
-
-const PROJECTED_GEO_SCORE = 78;
 
 export default function GeoPage() {
   const merchantId = useMerchant();
@@ -41,6 +40,9 @@ export default function GeoPage() {
   const [rewriteLoading, setRewriteLoading] = useState(false);
   const [savingToSupabase, setSavingToSupabase] = useState(false);
   const [toast, setToast] = useState<{ message: string; success: boolean } | null>(null);
+  const [keywordPanelPayload, setKeywordPanelPayload] = useState<PanelPayload>(null);
+  const [geoScore, setGeoScore] = useState(34);
+  const [projectedScore, setProjectedScore] = useState(78);
 
   useEffect(() => {
     if (!toast) return;
@@ -96,7 +98,7 @@ export default function GeoPage() {
       });
       const result = await res.json();
       if (res.ok && result.success) {
-        setToast({ message: "Listing updated in Supabase ✓", success: true });
+        setToast({ message: "Your listing has been updated ✓", success: true });
       } else {
         setToast({ message: "Save failed — check Supabase connection", success: false });
       }
@@ -144,6 +146,8 @@ export default function GeoPage() {
 
       setSuggestions(result.suggestions || FALLBACK_SUGGESTIONS);
       setOptimizedListing(typeof result.optimizedListing === "string" ? result.optimizedListing.trim() : "");
+      setGeoScore(typeof result.geoScore === "number" ? result.geoScore : 34);
+      setProjectedScore(typeof result.projectedScore === "number" ? result.projectedScore : 78);
       setError(null);
       setAnalysisDone(true);
       setTimeout(() => setShowProjected(true), 2500);
@@ -206,7 +210,19 @@ export default function GeoPage() {
         </select>
       </div>
 
-      <KeywordsDrivingClicks selectedProduct={selectedProduct} />
+      <KeywordsDrivingClicks
+        selectedProduct={selectedProduct}
+        onKeywordClick={(k) =>
+          setKeywordPanelPayload({
+            type: "keyword",
+            word: k.word,
+            views: k.views,
+            clicks: k.clicks,
+            purchases: k.purchases,
+            productKey: selectedProduct,
+          })
+        }
+      />
 
       <div className="rounded-xl border border-[var(--border)] bg-[var(--surface)] p-6 transition-shadow duration-150 hover:shadow-[0_0_0_1px_rgba(255,255,255,0.12)]">
         <h2 className="text-base font-semibold text-[#fafafa] mb-3">
@@ -227,6 +243,11 @@ export default function GeoPage() {
           <Sparkles className="w-4 h-4" />
           {loading ? "Analyzing…" : "Analyze with Gemini AI"}
         </button>
+        {loading && (
+          <p className="mt-2 text-sm text-[var(--brand-blue-light)] font-mono">
+            Gemini is analyzing…
+          </p>
+        )}
         <p className="mt-2 text-xs text-[var(--text-secondary)] font-mono">
           Runs Gemini and saves suggestions + optimized listing to Supabase.
         </p>
@@ -249,8 +270,8 @@ export default function GeoPage() {
               GEO Score
             </h2>
             <GeoScoreGauge
-              current={34}
-              projected={78}
+              current={geoScore}
+              projected={projectedScore}
               loaded={analysisDone}
               showProjected={showProjected}
             />
@@ -282,7 +303,7 @@ export default function GeoPage() {
                 Suggested Rewrite
               </h2>
               <p className="text-xs text-[#aaaaaa] font-mono mb-3">
-                Projected GEO score: +{PROJECTED_GEO_SCORE}
+                Projected GEO score: +{projectedScore}
               </p>
               <div className="rounded-lg border border-[var(--border)] bg-black/20 p-4 text-sm text-[var(--text-primary)] leading-relaxed font-mono mb-4 min-h-[100px]">
                 {suggestedRewrite}
@@ -292,7 +313,7 @@ export default function GeoPage() {
                   <button
                     type="button"
                     onClick={() => setRewriteAccepted(true)}
-                    className="inline-flex items-center gap-2 rounded-lg bg-[#22c55e] text-white font-semibold px-4 py-2 border border-[var(--border)] transition-colors duration-150 hover:opacity-90"
+                    className="inline-flex items-center gap-2 rounded-lg bg-[var(--brand-blue)] text-white font-semibold px-4 py-2 border border-[var(--border)] transition-colors duration-150 hover:opacity-90"
                   >
                     <ThumbsUp className="w-4 h-4" />
                     Looks good
@@ -304,7 +325,7 @@ export default function GeoPage() {
                     className="inline-flex items-center gap-2 rounded-lg bg-white/10 text-[var(--text-primary)] font-semibold px-4 py-2 border border-[var(--border)] disabled:opacity-50 transition-colors duration-150 hover:bg-white/15"
                   >
                     <RotateCcw className="w-4 h-4" />
-                    {rewriteLoading ? "Generating…" : "Try again"}
+                    {rewriteLoading ? "Gemini is rewriting…" : "Try again"}
                   </button>
                 </div>
               ) : (
@@ -316,10 +337,10 @@ export default function GeoPage() {
                     className="inline-flex items-center gap-2 rounded-lg bg-[var(--accent)] text-[var(--bg)] font-semibold px-4 py-2 border border-[var(--border)] disabled:opacity-50 disabled:cursor-not-allowed transition-colors duration-150 hover:shadow-[0_0_0_1px_rgba(255,255,255,0.12)]"
                   >
                     <Save className="w-4 h-4" />
-                    {savingToSupabase ? "Saving…" : "Save to Supabase"}
+                    {savingToSupabase ? "Saving…" : "Add this to my website"}
                   </button>
                   {toast && (
-                    <p className={`mt-3 text-sm font-mono ${toast.success ? "text-[#22c55e]" : "text-red-400"}`}>
+                    <p className={`mt-3 text-sm font-mono ${toast.success ? "text-[var(--brand-blue)]" : "text-[var(--brand-red)]"}`}>
                       {toast.message}
                     </p>
                   )}
@@ -369,14 +390,24 @@ export default function GeoPage() {
         </>
       )}
 
+      <DetailPanel
+        open={keywordPanelPayload !== null}
+        payload={keywordPanelPayload}
+        onClose={() => setKeywordPanelPayload(null)}
+        onKeywordBoost={() => {
+          setToast({ message: "Keyword boost request submitted", success: true });
+          setKeywordPanelPayload(null);
+        }}
+      />
+
       {toast && (
         <div
           role="status"
           className="fixed bottom-6 right-6 z-50 px-4 py-3 rounded-lg border shadow-lg font-mono text-sm animate-[fadeIn_0.2s_ease-out]"
           style={{
             backgroundColor: "var(--surface)",
-            borderColor: toast.success ? "#22c55e" : "var(--border)",
-            color: toast.success ? "#22c55e" : "#f87171",
+            borderColor: toast.success ? "var(--brand-blue)" : "var(--brand-red)",
+            color: toast.success ? "var(--brand-blue)" : "var(--brand-red)",
           }}
         >
           {toast.message}

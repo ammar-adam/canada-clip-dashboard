@@ -23,12 +23,14 @@ Return ONLY valid JSON, no markdown, no code fence. Use this exact structure:
 {
   "suggestions": [
     {
-      "issue": "short title under 6 words",
-      "why": "One sentence: why LLMs skip or downrank this listing.",
-      "fix": "Exact actionable wording: a sentence to add/replace, or 'Replace \"[current]\" with \"[new wording]\"' or 'Add after first sentence: \"[exact text]\"'.",
-      "impact": "High or Medium or Low"
+      "title": "short title under 6 words",
+      "severity": "HIGH or MEDIUM or LOW",
+      "description": "One sentence: why LLMs skip or downrank this listing.",
+      "fix": "Exact actionable wording: a sentence to add/replace, or 'Replace \"[current]\" with \"[new wording]\"' or 'Add after first sentence: \"[exact text]\"'."
     }
   ],
+  "geoScore": number from 0 to 100 (current listing score),
+  "projectedScore": number from 0 to 100 (score after applying suggestions),
   "optimized_listing": "Full rewritten listing, 2-4 sentences. Include price early, Canadian/location signal, concrete specs. No markdown. Ready to paste on their website."
 }
 
@@ -37,24 +39,33 @@ ${listing}`;
 
 const GEMINI_MODELS = ["gemini-2.0-flash", "gemini-1.5-flash", "gemini-1.5-pro"] as const;
 
-function parseGeminiResponse(text: string): { suggestions: GeoSuggestion[]; optimizedListing: string } {
+function parseGeminiResponse(text: string): {
+  suggestions: GeoSuggestion[];
+  optimizedListing: string;
+  geoScore: number;
+  projectedScore: number;
+} {
   let raw = text.trim();
   if (raw.startsWith("```")) {
     raw = raw.replace(/^```(?:json)?\s*/, "").replace(/\s*```$/, "");
   }
   const parsed = JSON.parse(raw);
-  const suggestions: GeoSuggestion[] = Array.isArray(parsed.suggestions)
-    ? parsed.suggestions
-    : Array.isArray(parsed)
-      ? parsed
-      : [];
+  const rawSuggestions = Array.isArray(parsed.suggestions) ? parsed.suggestions : [];
+  const suggestions: GeoSuggestion[] = rawSuggestions.map((s: Record<string, unknown>) => ({
+    issue: typeof s.title === "string" ? s.title : typeof s.issue === "string" ? s.issue : "Suggestion",
+    why: typeof s.description === "string" ? s.description : typeof s.why === "string" ? s.why : "",
+    fix: typeof s.fix === "string" ? s.fix : "",
+    impact: (typeof s.severity === "string" ? s.severity : typeof s.impact === "string" ? s.impact : "Medium") as "High" | "Medium" | "Low",
+  }));
   const optimizedListing =
     typeof parsed.optimized_listing === "string"
       ? parsed.optimized_listing.trim()
       : typeof parsed.optimizedListing === "string"
         ? parsed.optimizedListing.trim()
         : "";
-  return { suggestions, optimizedListing };
+  const geoScore = typeof parsed.geoScore === "number" ? Math.min(100, Math.max(0, parsed.geoScore)) : 34;
+  const projectedScore = typeof parsed.projectedScore === "number" ? Math.min(100, Math.max(0, parsed.projectedScore)) : 78;
+  return { suggestions, optimizedListing, geoScore, projectedScore };
 }
 
 export async function POST(req: Request) {
@@ -95,6 +106,8 @@ export async function POST(req: Request) {
   const genAI = new GoogleGenerativeAI(apiKey);
   let suggestions: GeoSuggestion[] = [];
   let optimizedListing = "";
+  let geoScore = 34;
+  let projectedScore = 78;
 
   for (const modelId of GEMINI_MODELS) {
     try {
@@ -106,6 +119,8 @@ export async function POST(req: Request) {
       if (parsed.suggestions.length === 0) continue;
       suggestions = parsed.suggestions;
       optimizedListing = parsed.optimizedListing;
+      geoScore = parsed.geoScore;
+      projectedScore = parsed.projectedScore;
       break;
     } catch (e) {
       console.warn(`GEO API: model ${modelId} failed`, e);
@@ -140,5 +155,5 @@ export async function POST(req: Request) {
     }
   }
 
-  return NextResponse.json({ suggestions, optimizedListing });
+  return NextResponse.json({ suggestions, optimizedListing, geoScore, projectedScore });
 }

@@ -6,8 +6,9 @@ import { merchantData } from "@/lib/merchantData";
 import type { Trigger } from "@/lib/merchantData";
 
 export function ActiveTriggers({
+  pausedQueries = new Set<string>(),
   onTriggerClick,
-}: { onTriggerClick?: (trigger: Trigger) => void } = {}) {
+}: { pausedQueries?: Set<string>; onTriggerClick?: (trigger: Trigger) => void } = {}) {
   const merchantId = useMerchant();
   const { triggers } = merchantData[merchantId];
 
@@ -29,17 +30,22 @@ export function ActiveTriggers({
             onKeyDown={(e) => e.key === "Enter" && onTriggerClick?.(t)}
             className="flex items-center justify-between px-4 py-3 transition-colors duration-150 hover:bg-[#2a2a2a] hover:border-l hover:border-l-white border-l border-l-transparent cursor-pointer"
           >
-            <span className="font-mono text-sm text-[var(--accent)]">
+            <span className="font-mono text-sm text-[var(--brand-blue-light)]">
               &quot;{t.query}&quot;
             </span>
-            <div className="flex items-center gap-2">
+            <div className="flex items-center gap-2 flex-wrap">
+              {pausedQueries.has(t.query) && (
+                <span className="rounded-full bg-[#555] text-[#aaa] text-xs font-mono px-2 py-0.5">
+                  Paused
+                </span>
+              )}
               <span className="text-sm text-[var(--text-secondary)] tabular-nums font-mono">
                 {t.impressions.toLocaleString()} impressions
               </span>
               {t.trend === "up" ? (
-                <TrendingUp className="w-4 h-4 text-[#22c55e] shrink-0" aria-hidden />
+                <TrendingUp className="w-4 h-4 text-[var(--brand-blue)] shrink-0" aria-hidden />
               ) : (
-                <TrendingDown className="w-4 h-4 text-[#ef4444] shrink-0" aria-hidden />
+                <TrendingDown className="w-4 h-4 text-[var(--brand-red)] shrink-0" aria-hidden />
               )}
             </div>
           </li>

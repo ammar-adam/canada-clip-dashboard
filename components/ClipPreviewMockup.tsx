@@ -47,9 +47,9 @@ export function ClipPreviewMockup() {
           style={{ boxShadow: "0 4px 24px rgba(0,0,0,0.12)" }}
         >
           <div className="p-4">
-            <div className="relative w-full aspect-square max-h-[180px] rounded-xl bg-[#f3f4f6] overflow-hidden mx-auto">
+            <div className="relative w-full aspect-square max-h-[180px] rounded-xl bg-[#f5f5f5] overflow-hidden mx-auto">
               {imageError ? (
-                <div className="absolute inset-0 flex items-center justify-center bg-[#d1d5db] text-[#6b7280] text-sm font-mono">
+                <div className="absolute inset-0 flex items-center justify-center bg-[#f5f5f5] text-[#6b7280] text-sm font-mono">
                   Product
                 </div>
               ) : (
@@ -57,7 +57,7 @@ export function ClipPreviewMockup() {
                   src={image}
                   alt={productName}
                   fill
-                  className="object-contain p-3"
+                  className="object-cover"
                   sizes="200px"
                   onError={() => setImageError(true)}
                 />
@@ -68,7 +68,7 @@ export function ClipPreviewMockup() {
             </p>
             <div className="flex items-center justify-center gap-2 mt-1 flex-wrap">
               <span className="text-sm text-[#6b7280]">{data.business}</span>
-              <span className="inline-flex items-center gap-0.5 rounded-full border border-white bg-[#22c55e] px-2 py-0.5 text-xs font-medium text-white">
+              <span className="inline-flex items-center gap-0.5 rounded-full border border-[var(--brand-red)] bg-[var(--brand-red-muted)] px-2 py-0.5 text-xs font-medium text-[var(--brand-red)]">
                 <MapleLeafIcon className="text-[#dc2626]" />
                 Local
               </span>
@@ -78,7 +78,7 @@ export function ClipPreviewMockup() {
             </p>
             <button
               type="button"
-              className="mt-4 w-full rounded-xl bg-[#C8102E] flex items-center justify-center gap-2 py-3 text-sm font-bold text-white"
+              className="mt-4 w-full rounded-xl bg-[var(--brand-red)] flex items-center justify-center gap-2 py-3 text-sm font-bold text-white"
             >
               <Compass className="w-4 h-4" strokeWidth={2.5} />
               Visit Store

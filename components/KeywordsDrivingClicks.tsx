@@ -4,7 +4,13 @@ import { useMerchant } from "@/contexts/MerchantContext";
 import { merchantData } from "@/lib/merchantData";
 import type { KeywordMetric } from "@/lib/merchantData";
 
-export function KeywordsDrivingClicks({ selectedProduct }: { selectedProduct: string }) {
+export function KeywordsDrivingClicks({
+  selectedProduct,
+  onKeywordClick,
+}: {
+  selectedProduct: string;
+  onKeywordClick?: (keyword: KeywordMetric) => void;
+}) {
   const merchantId = useMerchant();
   const data = merchantData[merchantId];
   const keywords: KeywordMetric[] =
@@ -23,11 +29,13 @@ export function KeywordsDrivingClicks({ selectedProduct }: { selectedProduct: st
       </p>
       <div className="flex flex-wrap gap-3 mt-4">
         {keywords.map((k) => (
-          <div
+          <button
+            type="button"
             key={k.word}
-            className="rounded-xl border border-[var(--border)] bg-[var(--surface)] p-4 min-w-[140px] transition-shadow duration-150 hover:shadow-[0_0_0_1px_rgba(255,255,255,0.12)]"
+            onClick={() => onKeywordClick?.(k)}
+            className="rounded-xl border border-[var(--border)] bg-[var(--surface)] p-4 min-w-[140px] text-left transition-all duration-150 hover:shadow-[0_0_0_1px_rgba(255,255,255,0.12)] hover:border-[var(--brand-blue-muted)] cursor-pointer"
           >
-            <p className="text-sm font-mono font-bold text-[var(--accent)] mb-3">
+            <p className="text-sm font-mono font-bold text-[var(--brand-blue-light)] mb-3">
               &quot;{k.word}&quot;
             </p>
             <div className="space-y-1.5 text-xs font-mono tabular-tight">
@@ -41,7 +49,7 @@ export function KeywordsDrivingClicks({ selectedProduct }: { selectedProduct: st
                 Purchases: {k.purchases.toLocaleString()}
               </p>
             </div>
-          </div>
+          </button>
         ))}
       </div>
       {topKeyword && (

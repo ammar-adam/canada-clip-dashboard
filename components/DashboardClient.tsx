@@ -63,6 +63,7 @@ export function DashboardClient() {
                 intercepted: row.intercepted,
                 action: row.action,
                 province: row.province,
+                journey: row.journey,
               },
             })
           }

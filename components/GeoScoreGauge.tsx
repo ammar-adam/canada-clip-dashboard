@@ -3,10 +3,10 @@
 import { useEffect, useState } from "react";
 
 function currentScoreColor(score: number) {
-  return score < 50 ? "#f59e0b" : "#22c55e";
+  return "var(--brand-red)";
 }
 
-const PROJECTED_COLOR = "#22c55e";
+const PROJECTED_COLOR = "var(--brand-blue)";
 
 export function GeoScoreGauge({
   current = 34,
