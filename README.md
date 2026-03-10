@@ -122,19 +122,6 @@ Copy `backend/.env.example` to `backend/.env.local` and fill in values.
 
 *Open the dashboard, then hit a merchant storefront and watch GEO in action.*
 
----
-
-## 👥 **Team**
-
-| Name | Role |
-|------|------|
-| **Ammar Adam** | Dashboard, backend, architecture |
-| **Pranav Marthi** | iOS App Clip (SwiftUI + Reactiv ClipKit) |
-| **Roderick Liao** | Figma UI/UX, 3D Launch Video |
-
----
-
-
 
 ### Walkthroughs
 
