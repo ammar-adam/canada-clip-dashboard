@@ -134,20 +134,7 @@ Copy `backend/.env.example` to `backend/.env.local` and fill in values.
 
 ---
 
-## 🏆 **Prizes We're Targeting**
 
-Reactiv ClipKit Lab ($5K) · Google Build with AI · SPUR Founder Track · MLH Auth0 · MLH Gemini API · Overall
-
----
-
-## 📢 **Build in Public**
-
-Full LinkedIn documentation of the build — from Friday night ideation through Saturday judging:
-
-- **Post 1:** [LinkedIn](https://www.linkedin.com/feed/update/urn:li:activity:7435902965711912960/)
-- **Post 2:** [LinkedIn](https://www.linkedin.com/feed/update/urn:li:activity:7436121175396859905/)
-- **Post 3:** [LinkedIn](https://www.linkedin.com/feed/update/urn:li:activity:7436197431433723904/)
-- **Post 4:** [LinkedIn](https://www.linkedin.com/feed/update/urn:li:activity:7436280429051138048/)
 
 ### Walkthroughs
 
